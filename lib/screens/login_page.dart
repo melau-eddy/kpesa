@@ -12,7 +12,7 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController _passwordController = TextEditingController();
   bool _obscurePassword = true;
 
-  Color get _purpleAccent => const Color(0xFF845EC2);
+  Color get _purpleAccent => const Color.fromARGB(255, 55, 194, 21);
 
   @override
   Widget build(BuildContext context) {
@@ -36,12 +36,11 @@ class _LoginPageState extends State<LoginPage> {
               const SizedBox(height: 24),
               // Illustration placeholder
               Expanded(
-                child: Center(
-                  child: Icon(
-                    Icons.people_alt,
-                    color: _purpleAccent.withAlpha((0.7 * 255).toInt()),
-                    size: 150,
-                  ),
+                child: Image.asset(
+                  'assets/K-PESA.png',
+                  width: 650,
+                  height: 650,
+                  // color: _purpleAccent.withAlpha((0.7 * 255).toInt()),
                 ),
               ),
               const SizedBox(height: 24),
@@ -58,7 +57,13 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ),
                 onPressed: _signIn,
-                child: const Text('Sign in', style: TextStyle(fontSize: 18)),
+                child: const Text(
+                  'Sign in',
+                  style: TextStyle(
+                    fontSize: 18,
+                    color: Color.fromARGB(255, 255, 255, 255),
+                  ),
+                ),
               ),
               const Spacer(),
               Row(
