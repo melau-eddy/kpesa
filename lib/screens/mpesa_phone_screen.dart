@@ -26,8 +26,7 @@ class _MpesaPhoneScreenState extends State<MpesaPhoneScreen> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final textColor = isDark ? Colors.white : Colors.black87;
     final subtleColor = isDark ? Colors.white70 : Colors.black54;
-    final surfaceColor =
-        isDark ? Colors.grey[850]! : const Color(0xFFF5F5F5);
+    final surfaceColor = isDark ? Colors.grey[850]! : const Color(0xFFF5F5F5);
 
     return Scaffold(
       body: SafeArea(
@@ -70,9 +69,7 @@ class _MpesaPhoneScreenState extends State<MpesaPhoneScreen> {
                   decoration: BoxDecoration(
                     color: surfaceColor,
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: _accent.withValues(alpha: 0.3),
-                    ),
+                    border: Border.all(color: _accent.withValues(alpha: 0.3)),
                   ),
                   child: Row(
                     children: [
@@ -173,10 +170,7 @@ class _MpesaPhoneScreenState extends State<MpesaPhoneScreen> {
                   onPressed: null, // TODO: implement M-Pesa linking
                   child: const Text(
                     'Continue',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                    ),
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                   ),
                 ),
                 const SizedBox(height: 12),

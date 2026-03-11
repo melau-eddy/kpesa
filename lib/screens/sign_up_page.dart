@@ -194,7 +194,7 @@ class _SignUpPageState extends State<SignUpPage>
 
     final uri = Uri.https('oauth.deriv.com', '/oauth2/authorize', {
       'response_type': 'code',
-      'app_id': '32G2Zn2rvKAKeckIIYJLV',
+      'app_id': '00010190',
       'redirect_uri': 'https://k-pesa.tech/deriv-callback',
       'scope': 'read trade trading_information payments',
       'state': _expectedState!,
@@ -240,7 +240,7 @@ class _SignUpPageState extends State<SignUpPage>
       Uri.parse('https://oauth.deriv.com/oauth2/token'),
       body: {
         'grant_type': 'authorization_code',
-        'client_id': '32G2Zn2rvKAKeckIIYJLV',
+        'client_id': '00010190',
         'code_verifier': _codeVerifier!,
         'code': code,
         'redirect_uri': 'https://k-pesa.tech/deriv-callback',
@@ -382,11 +382,20 @@ class _SignUpPageState extends State<SignUpPage>
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 10),
-            const _StepRow(number: '1', text: 'Tap the profile icon (top-left)'),
+            const _StepRow(
+              number: '1',
+              text: 'Tap the profile icon (top-left)',
+            ),
             const SizedBox(height: 6),
-            const _StepRow(number: '2', text: 'Your UID is shown below your name'),
+            const _StepRow(
+              number: '2',
+              text: 'Your UID is shown below your name',
+            ),
             const SizedBox(height: 6),
-            const _StepRow(number: '3', text: 'Tap the copy icon next to the UID'),
+            const _StepRow(
+              number: '3',
+              text: 'Tap the copy icon next to the UID',
+            ),
             const SizedBox(height: 6),
             const _StepRow(number: '4', text: 'Return to this app'),
             const SizedBox(height: 8),
@@ -395,10 +404,7 @@ class _SignUpPageState extends State<SignUpPage>
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text(
-              'Cancel',
-              style: TextStyle(color: Colors.grey),
-            ),
+            child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
@@ -418,33 +424,12 @@ class _SignUpPageState extends State<SignUpPage>
     if (confirmed != true || !mounted) return;
 
     // Step 2 — open Binance app to the profile page
-    // We attempt multiple schemes; if all return false we still proceed
-    // because url_launcher can return false even when the app does open.
     try {
       await launchUrl(
-        Uri.parse('binance://user/profile'),
+        Uri.parse('https://app.binance.com/profile'),
         mode: LaunchMode.externalApplication,
       );
-    } catch (_) {
-      try {
-        await launchUrl(
-          Uri(scheme: 'binance', host: 'open'),
-          mode: LaunchMode.externalApplication,
-        );
-      } catch (_) {
-        try {
-          await launchUrl(
-            Uri.parse(
-              'intent://open#Intent;'
-              'package=com.binance.dev;'
-              'scheme=binance;'
-              'end',
-            ),
-            mode: LaunchMode.externalApplication,
-          );
-        } catch (_) {}
-      }
-    }
+    } catch (_) {}
 
     // Step 3 — start polling clipboard every 2 s
     _waitingForBinanceId = true;
@@ -873,10 +858,7 @@ class _StepRow extends StatelessWidget {
         ),
         const SizedBox(width: 10),
         Expanded(
-          child: Text(
-            text,
-            style: const TextStyle(fontSize: 13, height: 1.4),
-          ),
+          child: Text(text, style: const TextStyle(fontSize: 13, height: 1.4)),
         ),
       ],
     );
