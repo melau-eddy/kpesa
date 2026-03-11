@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'sign_up_page.dart';
+import 'home_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key, required this.onToggleTheme});
@@ -25,6 +26,7 @@ class _LoginPageState extends State<LoginPage> {
     final borderColor = isDark ? Colors.white54 : Colors.black38;
 
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24.0),
@@ -166,8 +168,10 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void _signIn() {
-    // TODO: Implement sign in logic
-    debugPrint('email: ${_emailController.text}');
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const HomePage()),
+    );
   }
 
   void _signUp() {
