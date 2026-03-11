@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'sign_up_page.dart';
 
 class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+  const LoginPage({super.key, required this.onToggleTheme});
+
+  final VoidCallback onToggleTheme;
 
   @override
   State<LoginPage> createState() => _LoginPageState();
@@ -12,45 +15,61 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController _passwordController = TextEditingController();
   bool _obscurePassword = true;
 
-  Color get _purpleAccent => const Color.fromARGB(255, 55, 194, 21);
+  Color get _accentColor => const Color.fromARGB(255, 55, 194, 21);
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textColor = isDark ? Colors.white : Colors.black87;
+    final subtleColor = isDark ? Colors.white70 : Colors.black54;
+    final borderColor = isDark ? Colors.white54 : Colors.black38;
+
     return Scaffold(
-      backgroundColor: Colors.black,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const SizedBox(height: 40),
-              const Text(
+              const SizedBox(height: 16),
+              Align(
+                alignment: Alignment.centerRight,
+                child: IconButton(
+                  icon: Icon(
+                    isDark ? Icons.light_mode : Icons.dark_mode,
+                    color: subtleColor,
+                  ),
+                  tooltip: isDark
+                      ? 'Switch to light mode'
+                      : 'Switch to dark mode',
+                  onPressed: widget.onToggleTheme,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
                 'Sign in',
                 style: TextStyle(
-                  color: Colors.white,
+                  color: textColor,
                   fontSize: 32,
                   fontWeight: FontWeight.bold,
                 ),
               ),
               const SizedBox(height: 24),
-              // Illustration placeholder
               Expanded(
                 child: Image.asset(
                   'assets/K-PESA.png',
                   width: 650,
                   height: 650,
-                  // color: _purpleAccent.withAlpha((0.7 * 255).toInt()),
                 ),
               ),
               const SizedBox(height: 24),
-              _buildEmailField(),
+              _buildEmailField(textColor, subtleColor, borderColor),
               const SizedBox(height: 16),
-              _buildPasswordField(),
+              _buildPasswordField(textColor, subtleColor, borderColor),
               const SizedBox(height: 24),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: _purpleAccent,
+                  backgroundColor: _accentColor,
                   padding: const EdgeInsets.symmetric(vertical: 16.0),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(30),
@@ -59,25 +78,22 @@ class _LoginPageState extends State<LoginPage> {
                 onPressed: _signIn,
                 child: const Text(
                   'Sign in',
-                  style: TextStyle(
-                    fontSize: 18,
-                    color: Color.fromARGB(255, 255, 255, 255),
-                  ),
+                  style: TextStyle(fontSize: 18, color: Colors.white),
                 ),
               ),
               const Spacer(),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Text(
+                  Text(
                     "Don't have an account?",
-                    style: TextStyle(color: Colors.white70),
+                    style: TextStyle(color: subtleColor),
                   ),
                   TextButton(
                     onPressed: _signUp,
                     child: Text(
                       'Sign up',
-                      style: TextStyle(color: _purpleAccent),
+                      style: TextStyle(color: _accentColor),
                     ),
                   ),
                 ],
@@ -90,46 +106,54 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Widget _buildEmailField() {
+  Widget _buildEmailField(
+    Color textColor,
+    Color subtleColor,
+    Color borderColor,
+  ) {
     return TextField(
       controller: _emailController,
-      style: const TextStyle(color: Colors.white),
+      style: TextStyle(color: textColor),
       keyboardType: TextInputType.emailAddress,
       decoration: InputDecoration(
         labelText: 'Email',
-        labelStyle: const TextStyle(color: Colors.white70),
+        labelStyle: TextStyle(color: subtleColor),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(30),
-          borderSide: BorderSide(color: Colors.white54),
+          borderSide: BorderSide(color: borderColor),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(30),
-          borderSide: BorderSide(color: _purpleAccent),
+          borderSide: BorderSide(color: _accentColor),
         ),
       ),
     );
   }
 
-  Widget _buildPasswordField() {
+  Widget _buildPasswordField(
+    Color textColor,
+    Color subtleColor,
+    Color borderColor,
+  ) {
     return TextField(
       controller: _passwordController,
-      style: const TextStyle(color: Colors.white),
+      style: TextStyle(color: textColor),
       obscureText: _obscurePassword,
       decoration: InputDecoration(
         labelText: 'Password',
-        labelStyle: const TextStyle(color: Colors.white70),
+        labelStyle: TextStyle(color: subtleColor),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(30),
-          borderSide: BorderSide(color: Colors.white54),
+          borderSide: BorderSide(color: borderColor),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(30),
-          borderSide: BorderSide(color: _purpleAccent),
+          borderSide: BorderSide(color: _accentColor),
         ),
         suffixIcon: IconButton(
           icon: Icon(
             _obscurePassword ? Icons.visibility_off : Icons.visibility,
-            color: Colors.white70,
+            color: subtleColor,
           ),
           onPressed: () {
             setState(() {
@@ -143,10 +167,13 @@ class _LoginPageState extends State<LoginPage> {
 
   void _signIn() {
     // TODO: Implement sign in logic
-    debugPrint('email: ${_emailController.text}');
+    debugPrint('email: ${_emailController.text}');
   }
 
   void _signUp() {
-    // TODO: navigate to sign up page
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const SignUpPage()),
+    );
   }
 }
