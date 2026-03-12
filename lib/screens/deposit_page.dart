@@ -11,37 +11,38 @@ class _DepositPageState extends State<DepositPage> {
   // 0 = Deriv, 1 = MT5, 2 = Binance
   int _selectedTab = 0;
   String _amountStr = '0';
-  bool _showUsd = true;
+  bool _isKesInput = true;
 
   static const _accent = Color.fromARGB(255, 55, 194, 21);
   static const double _exchangeRate = 133.77375;
 
   double get _usdAmount {
     final parsed = double.tryParse(_amountStr) ?? 0;
-    return _showUsd ? parsed : parsed / _exchangeRate;
+    return _isKesInput ? (parsed / _exchangeRate) : parsed;
   }
 
   double get _kesAmount {
     final parsed = double.tryParse(_amountStr) ?? 0;
-    return _showUsd ? parsed * _exchangeRate : parsed;
+    return _isKesInput ? parsed : (parsed * _exchangeRate);
   }
 
   String get _displayAmount {
-    final parsed = double.tryParse(_amountStr) ?? 0;
-    if (_amountStr == '0') return '0.00';
-    // If the user typed digits, show as USD amount
-    if (_showUsd) {
-      return parsed.toStringAsFixed(2);
-    } else {
-      return parsed.toStringAsFixed(2);
-    }
+    if (_amountStr.isEmpty) return '0';
+    return _amountStr;
   }
 
   void _onDigit(String digit) {
     setState(() {
+      if (digit == '.') {
+        if (!_amountStr.contains('.')) {
+          _amountStr += '.';
+        }
+        return;
+      }
+
       if (_amountStr == '0') {
         _amountStr = digit;
-      } else if (_amountStr.length < 8) {
+      } else if (_amountStr.length < 12) {
         _amountStr += digit;
       }
     });
@@ -54,12 +55,6 @@ class _DepositPageState extends State<DepositPage> {
       } else {
         _amountStr = '0';
       }
-    });
-  }
-
-  void _toggleCurrency() {
-    setState(() {
-      _showUsd = !_showUsd;
     });
   }
 
@@ -80,180 +75,179 @@ class _DepositPageState extends State<DepositPage> {
     final canDeposit = usdVal >= 5;
 
     return Scaffold(
+      backgroundColor: isDark ? const Color(0xFF131313) : Colors.white,
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
+          padding: const EdgeInsets.symmetric(horizontal: 24),
           child: Column(
             children: [
               // ── Header ────────────────────────────────────
-              const SizedBox(height: 8),
-              Stack(
-                alignment: Alignment.center,
+              const SizedBox(height: 12),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: IconButton(
-                      onPressed: () => Navigator.pop(context),
-                      icon: Icon(Icons.close, color: textColor, size: 26),
-                    ),
+                  GestureDetector(
+                    onTap: () => Navigator.pop(context),
+                    child: Icon(Icons.close, size: 28, color: textColor),
                   ),
                   Text(
                     'Deposit',
                     style: TextStyle(
                       color: textColor,
-                      fontSize: 22,
+                      fontSize: 20,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
+                  const SizedBox(width: 28), // For balance
                 ],
               ),
 
-              const SizedBox(height: 24),
+              const SizedBox(height: 24), // Replaced 48 with 24 to fix overflow
 
-              // ── "To" label ────────────────────────────────
-              Text(
-                'To',
-                style: TextStyle(color: subtleColor, fontSize: 14),
+              // ── "To" section ────────────────────────────────
+              Center(
+                child: Text(
+                  'To',
+                  style: TextStyle(color: subtleColor, fontSize: 14),
+                ),
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: 16),
 
               // ── Segmented toggle ──────────────────────────
               _buildSegmentedToggle(isDark, cardBg, textColor),
 
-              const SizedBox(height: 28),
+              const SizedBox(height: 24),
 
-              // ── Amount display ────────────────────────────
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
+              // ── Amount display (Converted USD) ────────────
+              Stack(
+                alignment: Alignment.center,
+                clipBehavior: Clip.none,
                 children: [
-                  TweenAnimationBuilder<double>(
-                    tween: Tween<double>(
-                        begin: 0,
-                        end: double.tryParse(_amountStr) ?? 0),
-                    duration: const Duration(milliseconds: 300),
-                    curve: Curves.easeOut,
-                    builder: (context, value, child) {
-                      return Text(
-                        _amountStr == '0' ? '0.00' : value.toStringAsFixed(2),
-                        style: TextStyle(
-                          color: textColor,
-                          fontSize: 42,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      );
-                    },
-                  ),
-                  const SizedBox(width: 6),
-                  Text(
-                    _showUsd ? 'USD' : 'KES',
-                    style: TextStyle(
-                      color: subtleColor,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  GestureDetector(
-                    onTap: _toggleCurrency,
-                    child: Container(
-                      padding: const EdgeInsets.all(6),
-                      decoration: BoxDecoration(
-                        color: cardBg,
-                        borderRadius: BorderRadius.circular(8),
+                  Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          TweenAnimationBuilder<double>(
+                            tween: Tween<double>(
+                                begin: 0,
+                                end: _isKesInput ? usdVal : kesVal),
+                            duration: const Duration(milliseconds: 300),
+                            curve: Curves.easeOut,
+                            builder: (context, value, child) {
+                              return Text(
+                                _isKesInput
+                                    ? value.toStringAsFixed(2)
+                                    : value.toStringAsFixed(0),
+                                style: TextStyle(
+                                  color: textColor,
+                                  fontSize: 48,
+                                  fontWeight: FontWeight.w500,
+                                  letterSpacing: -1,
+                                ),
+                              );
+                            },
+                          ),
+                          const SizedBox(width: 8),
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 8.0),
+                            child: Text(
+                              _isKesInput ? 'USD' : 'KES',
+                              style: TextStyle(
+                                color: subtleColor,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 6.0),
+                            child: GestureDetector(
+                              behavior: HitTestBehavior.opaque,
+                              onTap: () {
+                                setState(() {
+                                  _isKesInput = !_isKesInput;
+                                  _amountStr = '0';
+                                });
+                              },
+                              child: Icon(
+                                Icons.import_export_rounded,
+                                color: subtleColor,
+                                size: 28,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                      child: Icon(
-                        Icons.swap_vert_rounded,
-                        color: subtleColor,
-                        size: 22,
+                      const SizedBox(height: 8),
+                      Text(
+                        '1 USD = ${_exchangeRate.toStringAsFixed(5)} KES',
+                        style: TextStyle(color: subtleColor, fontSize: 14),
                       ),
-                    ),
+                    ],
                   ),
                 ],
-              ),
-              const SizedBox(height: 6),
-              Text(
-                '1 USD = ${_exchangeRate.toStringAsFixed(5)} KES',
-                style: TextStyle(color: subtleColor, fontSize: 13),
               ),
 
               const SizedBox(height: 24),
 
-              // ── KES equivalent ────────────────────────────
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-                decoration: BoxDecoration(
-                  border: Border(
-                    top: BorderSide(
-                        color: isDark ? Colors.white12 : Colors.black12),
-                    bottom: BorderSide(
-                        color: isDark ? Colors.white12 : Colors.black12),
+              // ── Input Amount (centered with divider) ─────────
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    _isKesInput ? 'KES' : 'USD',
+                    style: TextStyle(
+                      color: textColor,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
-                ),
-                child: Row(
-                  children: [
-                    Text(
-                      _showUsd ? 'KES' : 'USD',
-                      style: TextStyle(
-                        color: subtleColor,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                      ),
+                  const SizedBox(width: 8),
+                  Text(
+                    _displayAmount,
+                    style: TextStyle(
+                      color: subtleColor,
+                      fontSize: 20,
+                      fontWeight: FontWeight.w500,
                     ),
-                    const SizedBox(width: 12),
-                    TweenAnimationBuilder<double>(
-                      tween: Tween<double>(
-                          begin: 0,
-                          end: _showUsd ? kesVal : usdVal),
-                      duration: const Duration(milliseconds: 300),
-                      curve: Curves.easeOut,
-                      builder: (context, value, child) {
-                        return Text(
-                          value.toStringAsFixed(2),
-                          style: const TextStyle(
-                            color: _accent,
-                            fontSize: 18,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        );
-                      },
-                    ),
-                  ],
-                ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Divider(
+                color: isDark ? Colors.white24 : Colors.black26,
+                thickness: 1,
               ),
 
-              const SizedBox(height: 8),
+              const SizedBox(height: 12),
 
               // ── Minimum deposit note ───────────────────────
               Text(
                 'Minimum deposit amount is 5 USD',
                 style: TextStyle(
-                  color: subtleColor,
-                  fontSize: 13,
+                  color: textColor,
+                  fontSize: 14,
                   fontWeight: FontWeight.w500,
                 ),
               ),
 
-              const SizedBox(height: 16),
+              const Spacer(),
 
               // ── Number pad ─────────────────────────────────
-              Expanded(
-                child: _buildNumberPad(keyBg, textColor),
-              ),
+              _buildNumberPad(keyBg, textColor),
 
-              const SizedBox(height: 12),
+              const SizedBox(height: 24),
 
               // ── Deposit button ─────────────────────────────
               SizedBox(
                 width: double.infinity,
-                height: 56,
+                height: 54,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: canDeposit
-                        ? _accent
-                        : (isDark
-                            ? const Color.fromARGB(255, 50, 50, 50)
-                            : const Color.fromARGB(255, 200, 200, 200)),
+                    backgroundColor: canDeposit ? _accent : const Color(0xFF232323),
                     foregroundColor: canDeposit
                         ? Colors.white
                         : (isDark ? Colors.white38 : Colors.black38),
@@ -277,23 +271,29 @@ class _DepositPageState extends State<DepositPage> {
                         }
                       : null,
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
+                      const Spacer(),
                       Text(
                         'Deposit',
                         style: TextStyle(
-                          fontSize: 18,
+                          color: canDeposit ? Colors.white : Colors.white24,
+                          fontSize: 16,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      const SizedBox(width: 8),
-                      const Icon(Icons.chevron_right, size: 24),
+                      const Spacer(),
+                      Icon(
+                        Icons.chevron_right,
+                        color: canDeposit ? Colors.white : Colors.white24,
+                        size: 20,
+                      ),
                     ],
                   ),
                 ),
               ),
 
-              const SizedBox(height: 20),
+              const SizedBox(height: 16),
             ],
           ),
         ),
@@ -309,8 +309,8 @@ class _DepositPageState extends State<DepositPage> {
     return Container(
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
-        color: cardBg,
-        borderRadius: BorderRadius.circular(30),
+        color: const Color(0xFF202020),
+        borderRadius: BorderRadius.circular(16),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -321,10 +321,10 @@ class _DepositPageState extends State<DepositPage> {
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 200),
               padding:
-                  const EdgeInsets.symmetric(horizontal: 22, vertical: 10),
+                  const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
               decoration: BoxDecoration(
-                color: isActive ? _accent : Colors.transparent,
-                borderRadius: BorderRadius.circular(26),
+                color: isActive ? _accent : Colors.transparent, // K-Pesa Accent
+                borderRadius: BorderRadius.circular(12),
               ),
               child: Text(
                 labels[i],
@@ -346,83 +346,73 @@ class _DepositPageState extends State<DepositPage> {
   // ── Number pad widget ─────────────────────────────────────────────────────
 
   Widget _buildNumberPad(Color keyBg, Color textColor) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final spacing = 10.0;
-        final keyWidth = (constraints.maxWidth - spacing * 2) / 3;
-        final keyHeight =
-            (constraints.maxHeight - spacing * 3) / 4;
+    const double spacing = 12.0;
+    const double keyHeight = 54.0; // Flat, oval looking keys
 
-        return Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            _padRow(['1', '2', '3'], keyBg, textColor, keyWidth, keyHeight,
-                spacing),
-            SizedBox(height: spacing),
-            _padRow(['4', '5', '6'], keyBg, textColor, keyWidth, keyHeight,
-                spacing),
-            SizedBox(height: spacing),
-            _padRow(['7', '8', '9'], keyBg, textColor, keyWidth, keyHeight,
-                spacing),
-            SizedBox(height: spacing),
-            _padRow(['', '0', '⌫'], keyBg, textColor, keyWidth, keyHeight,
-                spacing),
-          ],
-        );
-      },
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        _padRow(['1', '2', '3'], const Color(0xFF282828), textColor, keyHeight, spacing),
+        const SizedBox(height: spacing),
+        _padRow(['4', '5', '6'], const Color(0xFF282828), textColor, keyHeight, spacing),
+        const SizedBox(height: spacing),
+        _padRow(['7', '8', '9'], const Color(0xFF282828), textColor, keyHeight, spacing),
+        const SizedBox(height: spacing),
+        _padRow(['.', '0', '⌫'], const Color(0xFF282828), textColor, keyHeight, spacing),
+      ],
     );
   }
 
   Widget _padRow(List<String> keys, Color keyBg, Color textColor,
-      double keyWidth, double keyHeight, double spacing) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: keys.asMap().entries.map((entry) {
-        final i = entry.key;
-        final key = entry.value;
-        final isLast = i == keys.length - 1;
-        final isFirst = i == 0;
+      double keyHeight, double spacing) {
+    final List<Widget> children = [];
 
-        if (key.isEmpty) {
-          return SizedBox(width: keyWidth, height: keyHeight);
-        }
+    for (int i = 0; i < keys.length; i++) {
+      final key = keys[i];
 
-        return Padding(
-          padding: EdgeInsets.only(
-            right: !isLast ? spacing : 0,
-            left: isFirst ? 0 : 0,
-          ),
-          child: GestureDetector(
-            onTap: () {
-              if (key == '⌫') {
-                _onBackspace();
-              } else {
-                _onDigit(key);
-              }
-            },
-            child: Container(
-              width: keyWidth,
-              height: keyHeight,
-              decoration: BoxDecoration(
-                color: keyBg,
-                borderRadius: BorderRadius.circular(16),
-              ),
-              alignment: Alignment.center,
-              child: key == '⌫'
-                  ? Icon(Icons.backspace_outlined,
-                      color: textColor, size: 24)
-                  : Text(
-                      key,
-                      style: TextStyle(
-                        color: textColor,
-                        fontSize: 26,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
+      Widget child;
+      if (key.isEmpty) {
+        child = const SizedBox.shrink();
+      } else {
+        child = GestureDetector(
+          onTap: () {
+            if (key == '⌫') {
+              _onBackspace();
+            } else {
+              _onDigit(key);
+            }
+          },
+          child: Container(
+            height: keyHeight,
+            decoration: BoxDecoration(
+              color: keyBg,
+              borderRadius: BorderRadius.circular(24),
             ),
+            alignment: Alignment.center,
+            child: key == '⌫'
+                ? Icon(Icons.backspace_outlined, color: textColor, size: 24)
+                : Text(
+                    key,
+                    style: TextStyle(
+                      color: textColor,
+                      fontSize: 24,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
           ),
         );
-      }).toList(),
+      }
+
+      children.add(Expanded(child: child));
+
+      if (i < keys.length - 1) {
+        children.add(SizedBox(width: spacing));
+      }
+    }
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: children,
     );
   }
 }
