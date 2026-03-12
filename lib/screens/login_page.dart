@@ -25,83 +25,93 @@ class _LoginPageState extends State<LoginPage> {
     final subtleColor = isDark ? Colors.white70 : Colors.black54;
     final borderColor = isDark ? Colors.white54 : Colors.black38;
 
-    return Scaffold(
-      resizeToAvoidBottomInset: false,
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              const SizedBox(height: 16),
-              Align(
-                alignment: Alignment.centerRight,
-                child: IconButton(
-                  icon: Icon(
-                    isDark ? Icons.light_mode : Icons.dark_mode,
-                    color: subtleColor,
-                  ),
-                  tooltip: isDark
-                      ? 'Switch to light mode'
-                      : 'Switch to dark mode',
-                  onPressed: widget.onToggleTheme,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Sign in',
-                style: TextStyle(
-                  color: textColor,
-                  fontSize: 32,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 24),
-              Expanded(
-                child: Image.asset(
-                  isDark ? 'assets/K-PESA.png' : 'assets/K-pesa_light_mode.jpeg',
-                  width: 650,
-                  height: 650,
-                ),
-              ),
-              const SizedBox(height: 24),
-              _buildEmailField(textColor, subtleColor, borderColor),
-              const SizedBox(height: 16),
-              _buildPasswordField(textColor, subtleColor, borderColor),
-              const SizedBox(height: 24),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: _accentColor,
-                  padding: const EdgeInsets.symmetric(vertical: 16.0),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30),
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 400),
+      curve: Curves.easeInOut,
+      color: isDark ? Colors.black : Colors.white,
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        resizeToAvoidBottomInset: false,
+        body: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const SizedBox(height: 16),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: IconButton(
+                    icon: Icon(
+                      isDark ? Icons.light_mode : Icons.dark_mode,
+                      color: subtleColor,
+                    ),
+                    tooltip: isDark
+                        ? 'Switch to light mode'
+                        : 'Switch to dark mode',
+                    onPressed: widget.onToggleTheme,
                   ),
                 ),
-                onPressed: _signIn,
-                child: const Text(
+                const SizedBox(height: 8),
+                Text(
                   'Sign in',
-                  style: TextStyle(fontSize: 18, color: Colors.white),
-                ),
-              ),
-              const Spacer(),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    "Don't have an account?",
-                    style: TextStyle(color: subtleColor),
+                  style: TextStyle(
+                    color: textColor,
+                    fontSize: 32,
+                    fontWeight: FontWeight.bold,
                   ),
-                  TextButton(
-                    onPressed: _signUp,
-                    child: Text(
-                      'Sign up',
-                      style: TextStyle(color: _accentColor),
+                ),
+                const SizedBox(height: 24),
+                Expanded(
+                  child: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 400),
+                    child: Image.asset(
+                      isDark ? 'assets/K-PESA.png' : 'assets/K-pesa_light_mode.png',
+                      key: ValueKey(isDark),
+                      width: 650,
+                      height: 650,
                     ),
                   ),
-                ],
-              ),
-              const SizedBox(height: 16),
-            ],
+                ),
+                const SizedBox(height: 24),
+                _buildEmailField(textColor, subtleColor, borderColor),
+                const SizedBox(height: 16),
+                _buildPasswordField(textColor, subtleColor, borderColor),
+                const SizedBox(height: 24),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: _accentColor,
+                    padding: const EdgeInsets.symmetric(vertical: 16.0),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                  ),
+                  onPressed: _signIn,
+                  child: const Text(
+                    'Sign in',
+                    style: TextStyle(fontSize: 18, color: Colors.white),
+                  ),
+                ),
+                const Spacer(),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      "Don't have an account?",
+                      style: TextStyle(color: subtleColor),
+                    ),
+                    TextButton(
+                      onPressed: _signUp,
+                      child: Text(
+                        'Sign up',
+                        style: TextStyle(color: _accentColor),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+              ],
+            ),
           ),
         ),
       ),
