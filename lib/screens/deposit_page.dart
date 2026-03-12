@@ -58,6 +58,183 @@ class _DepositPageState extends State<DepositPage> {
     });
   }
 
+  void _showDepositDialog() {
+    bool _isMpesaSelected = false; // Move state variable outside
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        final isDark = Theme.of(context).brightness == Brightness.dark;
+        final textColor = isDark ? Colors.white : Colors.black87;
+        final cardBg = isDark
+            ? const Color(0xFF232323)
+            : const Color.fromARGB(255, 240, 240, 240);
+        final subtleColor = isDark ? Colors.white70 : Colors.black54;
+
+        return Dialog(
+          backgroundColor: cardBg,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: StatefulBuilder(
+            builder: (BuildContext context, StateSetter setState) {
+              return Padding(
+                padding: const EdgeInsets.all(24.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      'Choose Account',
+                      style: TextStyle(
+                        color: textColor,
+                        fontSize: 20,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      'You can set your default deposit account in the account setting page.',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: textColor,
+                        fontSize: 14,
+                        height: 1.4,
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    
+                    // M-PESA Account Option
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _isMpesaSelected = !_isMpesaSelected;
+                        });
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        decoration: BoxDecoration(
+                          color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
+                          border: Border.all(
+                            color: _isMpesaSelected
+                                ? _accent // K-Pesa Green highlight
+                                : (isDark ? Colors.white10 : Colors.black12),
+                          ),
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: Row(
+                          children: [
+                            // Placeholder for M-PESA logo (using text for now)
+                            Text(
+                              'M-PESA',
+                              style: TextStyle(
+                                color: Colors.greenAccent[700],
+                                fontWeight: FontWeight.bold,
+                                fontSize: 12,
+                              ),
+                            ),
+                            const SizedBox(width: 16),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'M-PESA',
+                                  style: TextStyle(
+                                    color: textColor,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  '254793814776',
+                                  style: TextStyle(
+                                    color: textColor,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const Spacer(),
+                            // Radio button outline
+                            Container(
+                              width: 20,
+                              height: 20,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: _isMpesaSelected
+                                    ? _accent
+                                    : Colors.transparent,
+                                border: Border.all(
+                                  color: _isMpesaSelected
+                                      ? _accent
+                                      : subtleColor,
+                                  width: 2,
+                                ),
+                              ),
+                              child: _isMpesaSelected
+                                  ? const Icon(
+                                      Icons.check,
+                                      size: 14,
+                                      color: Colors.white,
+                                    )
+                                  : null,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 32),
+
+                    // Proceed Button
+                    TextButton(
+                      onPressed: _isMpesaSelected
+                          ? () {
+                              // TODO: Implement actual proceed
+                              Navigator.pop(context);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('Processing Deposit via M-PESA...'),
+                                ),
+                              );
+                            }
+                          : null,
+                      child: Text(
+                        'Proceed',
+                        style: TextStyle(
+                          color: _isMpesaSelected
+                              ? _accent
+                              : Colors.white38, // Dimmed as in screenshot
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 12),
+
+                    // Cancel Deposit Button
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text(
+                        'Cancel Deposit',
+                        style: TextStyle(
+                          color: _accent, // K-Pesa Green
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -258,16 +435,19 @@ class _DepositPageState extends State<DepositPage> {
                   ),
                   onPressed: canDeposit
                       ? () {
-                          // TODO: Implement deposit action
-                          final destination =
-                              ['Deriv', 'MT5', 'Binance'][_selectedTab];
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                'Depositing \$${usdVal.toStringAsFixed(2)} USD to $destination',
+                          if (_selectedTab == 0) { // Deriv specifically requested
+                            _showDepositDialog();
+                          } else {
+                            final destination =
+                                ['Deriv', 'MT5', 'Binance'][_selectedTab];
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  'Depositing \$${usdVal.toStringAsFixed(2)} USD to $destination',
+                                ),
                               ),
-                            ),
-                          );
+                            );
+                          }
                         }
                       : null,
                   child: Row(
