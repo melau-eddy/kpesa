@@ -235,6 +235,127 @@ class _DepositPageState extends State<DepositPage> {
     );
   }
 
+  void _showMT5LinkDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        final isDark = Theme.of(context).brightness == Brightness.dark;
+        final textColor = isDark ? Colors.white : Colors.black87;
+        final cardBg = isDark
+            ? const Color(0xFF232323)
+            : const Color.fromARGB(255, 240, 240, 240);
+
+        return Dialog(
+          backgroundColor: cardBg,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(top: 24.0, bottom: 16.0, left: 16.0, right: 16.0),
+                child: Column(
+                  children: [
+                    Text(
+                      'Notice',
+                      style: TextStyle(
+                        color: textColor,
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      'Please select the MT5 account that you wish to link to your D M-PESA account',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: textColor,
+                        fontSize: 15,
+                        height: 1.4,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              
+              // Divider line above buttons
+              Divider(
+                color: isDark ? Colors.white10 : Colors.black12,
+                thickness: 1,
+                height: 1,
+              ),
+
+              // Bottom Buttons Row
+              IntrinsicHeight(
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: TextButton(
+                        onPressed: () {
+                          // TODO: Implement actual select linking
+                          Navigator.pop(context);
+                          setState(() => _selectedTab = 1);
+                        },
+                        style: TextButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.only(
+                              bottomLeft: Radius.circular(16),
+                            ),
+                          ),
+                        ),
+                        child: const Text(
+                          'Select',
+                          style: TextStyle(
+                            color: _accent, // K-Pesa Green
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ),
+                    VerticalDivider(
+                      color: isDark ? Colors.white10 : Colors.black12,
+                      thickness: 1,
+                      width: 1,
+                    ),
+                    Expanded(
+                      child: TextButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                          // Revert selection if user declines
+                          setState(() => _selectedTab = 0);
+                        },
+                        style: TextButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.only(
+                              bottomRight: Radius.circular(16),
+                            ),
+                          ),
+                        ),
+                        child: const Text(
+                          'Not Now',
+                          style: TextStyle(
+                            color: _accent, // K-Pesa Green
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -497,7 +618,13 @@ class _DepositPageState extends State<DepositPage> {
         children: List.generate(labels.length, (i) {
           final isActive = _selectedTab == i;
           return GestureDetector(
-            onTap: () => setState(() => _selectedTab = i),
+            onTap: () {
+              if (i == 1 && _selectedTab != 1) { // MT5 selected
+                _showMT5LinkDialog();
+              } else {
+                setState(() => _selectedTab = i);
+              }
+            },
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 200),
               padding:
