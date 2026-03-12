@@ -59,7 +59,7 @@ class _LoginPageState extends State<LoginPage> {
               const SizedBox(height: 24),
               Expanded(
                 child: Image.asset(
-                  'assets/K-PESA.png',
+                  isDark ? 'assets/K-PESA.png' : 'assets/K-pesa_light_mode.jpeg',
                   width: 650,
                   height: 650,
                 ),

@@ -426,7 +426,7 @@ class _SignUpPageState extends State<SignUpPage>
     // Step 2 — open Binance app to the profile page
     try {
       await launchUrl(
-        Uri.parse('https://app.binance.com/profile'),
+        Uri.parse('bnc://app.binance.com/mp/app'),
         mode: LaunchMode.externalApplication,
       );
     } catch (_) {}
