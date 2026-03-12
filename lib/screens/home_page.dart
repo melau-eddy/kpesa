@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'deposit_page.dart';
+import 'withdraw_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -207,7 +208,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
               ),
             ),
             onPressed: () {
-              // TODO: Implement withdraw logic
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const WithdrawPage()),
+              );
             },
             child: Text(
               'Withdraw',

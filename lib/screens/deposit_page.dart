@@ -190,13 +190,7 @@ class _DepositPageState extends State<DepositPage> {
                     TextButton(
                       onPressed: _isMpesaSelected
                           ? () {
-                              // TODO: Implement actual proceed
                               Navigator.pop(context);
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Processing Deposit via M-PESA...'),
-                                ),
-                              );
                             }
                           : null,
                       child: Text(
