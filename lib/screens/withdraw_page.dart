@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class WithdrawPage extends StatefulWidget {
   const WithdrawPage({super.key});
@@ -418,13 +419,23 @@ class _WithdrawPageState extends State<WithdrawPage> {
                   children: [
                     Expanded(
                       child: TextButton(
-                        onPressed: () {
+                        onPressed: () async {
                           Navigator.pop(context);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Fetching Binance balance...'),
-                            ),
-                          );
+                          setState(() => _selectedTab = 2);
+                          try {
+                            await launchUrl(
+                              Uri.parse('bnc://app.binance.com/mp/app'),
+                              mode: LaunchMode.externalApplication,
+                            );
+                          } catch (_) {
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('Could not open Binance app.'),
+                                ),
+                              );
+                            }
+                          }
                         },
                         style: TextButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 16),
