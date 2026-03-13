@@ -96,7 +96,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                     (context, animation, secondaryAnimation, child) {
                   const begin = Offset(1.0, 0.0);
                   const end = Offset.zero;
-                  final curve = Curves.easeOutCubic;
+                  final curve = Curves.easeOutQuart;
 
                   var tween = Tween(begin: begin, end: end)
                       .chain(CurveTween(curve: curve));
@@ -106,7 +106,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                     child: child,
                   );
                 },
-                transitionDuration: const Duration(milliseconds: 400),
+                transitionDuration: const Duration(milliseconds: 600),
               ),
             );
           },

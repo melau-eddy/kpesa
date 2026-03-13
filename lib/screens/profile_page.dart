@@ -6,15 +6,21 @@ class ProfilePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    
+    // Theme-adaptive colors
     final textColor = isDark ? Colors.white : Colors.black87;
     final subtleColor = isDark ? Colors.white70 : Colors.black54;
-    final cardBg = isDark
-        ? const Color.fromARGB(255, 30, 30, 30)
-        : const Color.fromARGB(255, 240, 240, 240);
-    final accentColor = const Color.fromARGB(255, 115, 60, 255); // Purple accent from screenshots
+    final bgColor = isDark ? const Color(0xFF131313) : const Color(0xFFF8F9FA);
+    final cardBg = isDark 
+        ? const Color(0xFF1E1E1E) 
+        : Colors.white;
+    final innerCardBg = isDark 
+        ? const Color(0xFF262626) 
+        : const Color(0xFFF1F3F5);
+    final accentColor = const Color.fromARGB(255, 55, 194, 21); // K-Pesa Green accent
 
     return Scaffold(
-      backgroundColor: isDark ? const Color(0xFF131313) : Colors.white,
+      backgroundColor: bgColor,
       body: SafeArea(
         child: Column(
           children: [
@@ -27,7 +33,7 @@ class ProfilePage extends StatelessWidget {
                     onPressed: () => Navigator.pop(context),
                     icon: Icon(Icons.close, color: textColor),
                   ),
-                  const Expanded(
+                  Expanded(
                     child: Text(
                       'Profile',
                       textAlign: TextAlign.center,
@@ -38,7 +44,7 @@ class ProfilePage extends StatelessWidget {
                       ),
                     ),
                   ),
-                  const SizedBox(width: 48), // Spacer for balance
+                  const SizedBox(width: 48), // Balance for back button
                 ],
               ),
             ),
@@ -48,7 +54,8 @@ class ProfilePage extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 24),
                 children: [
                   const SizedBox(height: 24),
-                  // ── User Info ──────────────────────────────
+                  
+                  // ── User Information ────────────────────────
                   Center(
                     child: Column(
                       children: [
@@ -83,30 +90,40 @@ class ProfilePage extends StatelessWidget {
 
                   const SizedBox(height: 32),
 
-                  // ── Summary Tiles ──────────────────────────
+                  // ── Summary Section (Screenshot Remodel) ─────
                   Container(
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
                       color: cardBg,
-                      borderRadius: BorderRadius.circular(24),
+                      borderRadius: BorderRadius.circular(32),
+                      boxShadow: isDark ? null : [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.05),
+                          blurRadius: 20,
+                          offset: const Offset(0, 10),
+                        )
+                      ],
                     ),
                     child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
                         _buildSummaryCard(
-                          'Deposits',
-                          'Ksh. 0',
-                          accentColor,
-                          textColor,
-                          subtleColor,
+                          label: 'Deposits',
+                          amount: 'Ksh. 0',
+                          cardBg: innerCardBg,
+                          accentColor: accentColor,
+                          textColor: textColor,
+                          subtleColor: subtleColor,
+                          isDark: isDark,
                         ),
                         const SizedBox(width: 16),
                         _buildSummaryCard(
-                          'Withdrawals',
-                          'Ksh. 0',
-                          accentColor,
-                          textColor,
-                          subtleColor,
+                          label: 'Withdrawals',
+                          amount: 'Ksh. 0',
+                          cardBg: innerCardBg,
+                          accentColor: accentColor,
+                          textColor: textColor,
+                          subtleColor: subtleColor,
+                          isDark: isDark,
                         ),
                       ],
                     ),
@@ -114,69 +131,75 @@ class ProfilePage extends StatelessWidget {
 
                   const SizedBox(height: 32),
 
-                  // ── Menu List ──────────────────────────────
+                  // ── Settings Menu ──────────────────────────
                   _buildMenuItem(
-                    icon: Icons.phone_outlined,
+                    icon: Icons.phone_android_rounded,
                     title: 'Payment Providers',
                     subtitle: 'Add, modify, remove',
+                    cardBg: cardBg,
                     accentColor: accentColor,
                     textColor: textColor,
                     subtleColor: subtleColor,
-                    cardBg: cardBg,
+                    isDark: isDark,
                   ),
                   _buildMenuItem(
-                    icon: Icons.account_balance_wallet_outlined,
+                    icon: Icons.account_balance_wallet_rounded,
                     title: 'MT5 Account',
                     subtitle: 'MTR*****',
+                    cardBg: cardBg,
                     accentColor: accentColor,
                     textColor: textColor,
                     subtleColor: subtleColor,
-                    cardBg: cardBg,
+                    isDark: isDark,
                   ),
                   _buildMenuItem(
-                    icon: Icons.group_outlined,
+                    icon: Icons.person_add_alt_1_rounded,
                     title: 'Default Accounts',
                     subtitle: 'MT5, Deposits, Withdrawals',
+                    cardBg: cardBg,
                     accentColor: accentColor,
                     textColor: textColor,
                     subtleColor: subtleColor,
-                    cardBg: cardBg,
+                    isDark: isDark,
                   ),
                   _buildMenuItem(
                     icon: Icons.shield_outlined,
                     title: 'Change Password',
                     subtitle: '*******',
+                    cardBg: cardBg,
                     accentColor: accentColor,
                     textColor: textColor,
                     subtleColor: subtleColor,
-                    cardBg: cardBg,
+                    isDark: isDark,
                   ),
                   _buildMenuItem(
-                    icon: Icons.help_outline,
+                    icon: Icons.help_rounded,
                     title: 'Help & feedback',
                     subtitle: 'Help center, contact us',
+                    cardBg: cardBg,
                     accentColor: accentColor,
                     textColor: textColor,
                     subtleColor: subtleColor,
-                    cardBg: cardBg,
+                    isDark: isDark,
                   ),
                   _buildMenuItem(
                     icon: Icons.settings_outlined,
                     title: 'Other Settings',
                     subtitle: 'Theme, biometrics',
+                    cardBg: cardBg,
                     accentColor: accentColor,
                     textColor: textColor,
                     subtleColor: subtleColor,
-                    cardBg: cardBg,
+                    isDark: isDark,
                   ),
                   _buildMenuItem(
                     icon: Icons.logout_rounded,
                     title: 'Sign Out',
-                    subtitle: null,
+                    cardBg: cardBg,
                     accentColor: accentColor,
                     textColor: textColor,
                     subtleColor: subtleColor,
-                    cardBg: cardBg,
+                    isDark: isDark,
                     showArrow: false,
                   ),
                   const SizedBox(height: 32),
@@ -189,73 +212,66 @@ class ProfilePage extends StatelessWidget {
     );
   }
 
-  Widget _buildSummaryCard(
-    String label,
-    String amount,
-    Color accentColor,
-    Color textColor,
-    Color subtleColor,
-  ) {
+  Widget _buildSummaryCard({
+    required String label,
+    required String amount,
+    required Color cardBg,
+    required Color accentColor,
+    required Color textColor,
+    required Color subtleColor,
+    required bool isDark,
+  }) {
     return Expanded(
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
+        padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 8),
         decoration: BoxDecoration(
-          color: isDark 
-              ? const Color.fromARGB(255, 38, 38, 38)
-              : Colors.white,
-          borderRadius: BorderRadius.circular(16),
+          color: cardBg,
+          borderRadius: BorderRadius.circular(24),
           border: Border.all(
-            color: isDark ? Colors.white10 : Colors.black.withValues(alpha: 0.05), 
-            width: 1,
+            color: isDark ? Colors.white.withValues(alpha: 0.05) : Colors.black.withValues(alpha: 0.05),
           ),
-          boxShadow: isDark ? null : [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.03),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            )
-          ],
         ),
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              padding: const EdgeInsets.all(10),
+              padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: accentColor.withValues(alpha: 0.1),
+                color: accentColor,
                 shape: BoxShape.circle,
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    accentColor,
-                    accentColor.withValues(alpha: 0.6),
-                  ],
-                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: accentColor.withValues(alpha: 0.4),
+                    blurRadius: 10,
+                    spreadRadius: 1,
+                  ),
+                ],
               ),
               child: const Text(
                 'KES',
                 style: TextStyle(
                   color: Colors.white,
-                  fontSize: 10,
+                  fontSize: 11,
                   fontWeight: FontWeight.bold,
                 ),
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 18),
             Text(
               amount,
               style: TextStyle(
                 color: textColor,
-                fontSize: 16,
+                fontSize: 20,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: 8),
             Text(
               label,
               style: TextStyle(
                 color: subtleColor,
-                fontSize: 12,
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
               ),
             ),
           ],
@@ -268,10 +284,11 @@ class ProfilePage extends StatelessWidget {
     required IconData icon,
     required String title,
     String? subtitle,
+    required Color cardBg,
     required Color accentColor,
     required Color textColor,
     required Color subtleColor,
-    required Color cardBg,
+    required bool isDark,
     bool showArrow = true,
   }) {
     return Padding(
@@ -281,6 +298,13 @@ class ProfilePage extends StatelessWidget {
         decoration: BoxDecoration(
           color: cardBg,
           borderRadius: BorderRadius.circular(20),
+          boxShadow: isDark ? null : [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.02),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            )
+          ],
         ),
         child: Row(
           children: [
