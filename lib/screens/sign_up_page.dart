@@ -8,8 +8,8 @@ import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
 import 'deriv_no_account_screen.dart';
-import 'deriv_success_screen.dart';
 import 'mpesa_phone_screen.dart';
+import '../models/signup_data.dart';
 import '../services/auth_storage.dart';
 
 // ─── Circular Chain Painter ───────────────────────────────────────────────────
@@ -325,8 +325,13 @@ class _SignUpPageState extends State<SignUpPage>
     if (hasLiveAccount) {
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
-          builder: (_) =>
-              DerivSuccessScreen(name: name, email: email, account: account),
+          builder: (_) => MpesaPhoneScreen(
+            signupData: SignupData(
+              derivEmail: email,
+              derivName: name,
+              derivAccount: account,
+            ),
+          ),
         ),
       );
     } else {
@@ -446,8 +451,8 @@ class _SignUpPageState extends State<SignUpPage>
     final text = data?.text?.trim() ?? '';
     if (text.isEmpty) return;
 
-    // Binance UIDs are typically 6-12 digit numbers
-    if (RegExp(r'^\d{6,12}$').hasMatch(text)) {
+    // Binance UIDs are typically 8-12 digit numbers
+    if (RegExp(r'^\d{8,12}$').hasMatch(text)) {
       _clipboardTimer?.cancel();
       _waitingForBinanceId = false;
       if (mounted) _showBinanceCopiedDialog(text);
@@ -508,7 +513,9 @@ class _SignUpPageState extends State<SignUpPage>
               if (mounted) {
                 Navigator.of(context).push(
                   MaterialPageRoute(
-                    builder: (_) => MpesaPhoneScreen(binanceId: binanceId),
+                    builder: (_) => MpesaPhoneScreen(
+                      signupData: SignupData(binanceId: binanceId),
+                    ),
                   ),
                 );
               }
