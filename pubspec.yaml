@@ -69,6 +69,8 @@ flutter:
     - assets/k-pesa_logo.png
     - assets/deriv.png
     - assets/binance.png
+    - assets/mpesa.png
+    - assets/airtel.png
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
 

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'payment_providers_page.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
@@ -147,6 +148,12 @@ class ProfilePage extends StatelessWidget {
                     textColor: textColor,
                     subtleColor: subtleColor,
                     isDark: isDark,
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const PaymentProvidersPage()),
+                      );
+                    },
                   ),
                   _buildMenuItem(
                     icon: Icons.account_balance_wallet_rounded,
@@ -295,22 +302,17 @@ class ProfilePage extends StatelessWidget {
     required Color textColor,
     required Color subtleColor,
     required bool isDark,
+    VoidCallback? onTap,
     bool showArrow = true,
   }) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
+      margin: const EdgeInsets.symmetric(vertical: 6),
       decoration: BoxDecoration(
         color: cardBg,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: isDark ? null : [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.03),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          )
-        ],
+        borderRadius: BorderRadius.circular(24),
       ),
       child: ListTile(
+        onTap: onTap,
         contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
         leading: Container(
           padding: const EdgeInsets.all(10),
