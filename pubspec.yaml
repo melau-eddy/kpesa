@@ -66,9 +66,12 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - assets/K-PESA.png
+    - assets/K-pesa_light_mode.png
     - assets/k-pesa_logo.png
     - assets/deriv.png
     - assets/binance.png
+    - assets/mpesa.png
+    - assets/airtel.png
     - assets/payment_logos/
     - assets/payment_logos/banks/
   #   - images/a_dot_burr.jpeg
