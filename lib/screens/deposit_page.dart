@@ -32,6 +32,9 @@ class _DepositPageState extends State<DepositPage> {
   }
 
   void _onDigit(String digit) {
+    // If already at or over the maximum limit (250,000 KES), stop accepting new digits.
+    if (_kesAmount >= 250000) return;
+
     setState(() {
       if (digit == '.') {
         if (!_amountStr.contains('.')) {
