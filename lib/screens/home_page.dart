@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'deposit_page.dart';
 import 'withdraw_page.dart';
+import 'profile_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -84,17 +85,43 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
             ),
           ],
         ),
-        Container(
-          width: 48,
-          height: 48,
-          decoration: BoxDecoration(
-            color: const Color.fromARGB(255, 100, 100, 100),
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: const Icon(
-            Icons.account_circle_outlined,
-            color: Colors.white,
-            size: 28,
+        GestureDetector(
+          onTap: () {
+            Navigator.push(
+              context,
+              PageRouteBuilder(
+                pageBuilder: (context, animation, secondaryAnimation) =>
+                    const ProfilePage(),
+                transitionsBuilder:
+                    (context, animation, secondaryAnimation, child) {
+                  const begin = Offset(1.0, 0.0);
+                  const end = Offset.zero;
+                  final curve = Curves.easeOutCubic;
+
+                  var tween = Tween(begin: begin, end: end)
+                      .chain(CurveTween(curve: curve));
+
+                  return SlideTransition(
+                    position: animation.drive(tween),
+                    child: child,
+                  );
+                },
+                transitionDuration: const Duration(milliseconds: 400),
+              ),
+            );
+          },
+          child: Container(
+            width: 48,
+            height: 48,
+            decoration: BoxDecoration(
+              color: const Color.fromARGB(255, 100, 100, 100),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: const Icon(
+              Icons.account_circle_outlined,
+              color: Colors.white,
+              size: 28,
+            ),
           ),
         ),
       ],
