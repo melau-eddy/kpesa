@@ -702,7 +702,7 @@ class _DepositPageState extends State<DepositPage> {
 
   Widget _buildNumberPad(Color keyBg, Color textColor) {
     const double spacing = 12.0;
-    const double keyHeight = 54.0; // Flat, oval looking keys
+    const double keyHeight = 54.0; 
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -713,7 +713,13 @@ class _DepositPageState extends State<DepositPage> {
         const SizedBox(height: spacing),
         _padRow(['7', '8', '9'], const Color(0xFF282828), textColor, keyHeight, spacing),
         const SizedBox(height: spacing),
-        _padRow(['.', '0', '⌫'], const Color(0xFF282828), textColor, keyHeight, spacing),
+        _padRow(
+          _isKesInput ? ['0', '⌫'] : ['.', '0', '⌫'],
+          const Color(0xFF282828),
+          textColor,
+          keyHeight,
+          spacing
+        ),
       ],
     );
   }
@@ -724,12 +730,11 @@ class _DepositPageState extends State<DepositPage> {
 
     for (int i = 0; i < keys.length; i++) {
       final key = keys[i];
+      final bool isExpandableCase = keys.length == 2 && key == '0';
 
-      Widget child;
-      if (key.isEmpty) {
-        child = const SizedBox.shrink();
-      } else {
-        child = Material(
+      final child = Expanded(
+        flex: isExpandableCase ? 2 : 1,
+        child: Material(
           color: keyBg,
           borderRadius: BorderRadius.circular(24),
           clipBehavior: Clip.antiAlias,
@@ -758,19 +763,15 @@ class _DepositPageState extends State<DepositPage> {
                     ),
             ),
           ),
-        );
-      }
+        ),
+      );
 
-      children.add(Expanded(child: child));
-
+      children.add(child);
       if (i < keys.length - 1) {
         children.add(SizedBox(width: spacing));
       }
     }
 
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: children,
-    );
+    return Row(children: children);
   }
 }

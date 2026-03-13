@@ -959,7 +959,7 @@ class _WithdrawPageState extends State<WithdrawPage> {
 
   Widget _buildNumberPad(Color keyBg, Color textColor) {
     const double spacing = 12.0;
-    const double keyHeight = 54.0; // Flat, oval looking keys
+    const double keyHeight = 54.0; 
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -970,7 +970,13 @@ class _WithdrawPageState extends State<WithdrawPage> {
         const SizedBox(height: spacing),
         _padRow(['7', '8', '9'], const Color(0xFF282828), textColor, keyHeight, spacing),
         const SizedBox(height: spacing),
-        _padRow(['.', '0', '⌫'], const Color(0xFF282828), textColor, keyHeight, spacing),
+        _padRow(
+          _isKesInput ? ['0', '⌫'] : ['.', '0', '⌫'], 
+          const Color(0xFF282828), 
+          textColor, 
+          keyHeight, 
+          spacing
+        ),
       ],
     );
   }
@@ -981,12 +987,11 @@ class _WithdrawPageState extends State<WithdrawPage> {
 
     for (int i = 0; i < keys.length; i++) {
       final key = keys[i];
+      final bool isExpandableCase = keys.length == 2 && key == '0';
 
-      Widget child;
-      if (key.isEmpty) {
-        child = const SizedBox.shrink();
-      } else {
-        child = Material(
+      final child = Expanded(
+        flex: isExpandableCase ? 2 : 1,
+        child: Material(
           color: keyBg,
           borderRadius: BorderRadius.circular(24),
           clipBehavior: Clip.antiAlias,
@@ -998,36 +1003,32 @@ class _WithdrawPageState extends State<WithdrawPage> {
                 _onDigit(key);
               }
             },
-            splashColor: _accent.withValues(alpha: 0.2),
-            highlightColor: _accent.withValues(alpha: 0.1),
-            child: Container(
+            child: SizedBox(
               height: keyHeight,
-              alignment: Alignment.center,
-              child: key == '⌫'
-                  ? Icon(Icons.backspace_outlined, color: textColor, size: 24)
-                  : Text(
-                      key,
-                      style: TextStyle(
-                        color: textColor,
-                        fontSize: 24,
-                        fontWeight: FontWeight.w600,
+              child: Center(
+                child: key == '⌫'
+                    ? Icon(Icons.backspace_outlined,
+                        color: textColor, size: 20)
+                    : Text(
+                        key,
+                        style: TextStyle(
+                          color: textColor,
+                          fontSize: 22,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
-                    ),
+              ),
             ),
           ),
-        );
-      }
+        ),
+      );
 
-      children.add(Expanded(child: child));
-
+      children.add(child);
       if (i < keys.length - 1) {
         children.add(SizedBox(width: spacing));
       }
     }
 
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: children,
-    );
+    return Row(children: children);
   }
 }
