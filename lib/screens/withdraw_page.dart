@@ -14,6 +14,7 @@ class _WithdrawPageState extends State<WithdrawPage> {
   bool _isKesInput = false;
   bool _isWithdrawDialogVisible = true;
   bool _isMpesaSelected = false;
+  bool _showLimitError = false;
 
   @override
   void initState() {
@@ -61,6 +62,9 @@ class _WithdrawPageState extends State<WithdrawPage> {
       
       if (kesVal <= 250000) {
         _amountStr = newStr;
+        _showLimitError = (kesVal >= 250000);
+      } else {
+        _showLimitError = true;
       }
     });
   }
@@ -71,6 +75,13 @@ class _WithdrawPageState extends State<WithdrawPage> {
         _amountStr = _amountStr.substring(0, _amountStr.length - 1);
       } else {
         _amountStr = '0';
+      }
+      
+      // Reset error if we are now under the limit
+      final parsed = double.tryParse(_amountStr) ?? 0;
+      final kesVal = _isKesInput ? parsed : (parsed * _exchangeRate);
+      if (kesVal < 250000) {
+        _showLimitError = false;
       }
     });
   }
@@ -624,8 +635,8 @@ class _WithdrawPageState extends State<WithdrawPage> {
 
     final usdVal = _usdAmount;
     final kesVal = _kesAmount;
-    final isLimitReached = kesVal >= 250000;
-    final canWithdraw = (_selectedTab == 2 ? usdVal >= 10 : usdVal >= 5) && !isLimitReached;
+    final isLimitReached = _showLimitError || kesVal >= 250000;
+    final canWithdraw = (_selectedTab == 2 ? usdVal >= 10 : usdVal >= 5) && kesVal <= 250000;
 
     final scaffold = Scaffold(
       backgroundColor: isDark ? const Color(0xFF131313) : Colors.white,
@@ -780,7 +791,7 @@ class _WithdrawPageState extends State<WithdrawPage> {
               // ── Dynamic Info Note ───────────────────────
               Text(
                 isLimitReached
-                    ? 'Maximum withdrawal amount is 250,000 KES'
+                    ? 'Maximum withdrawal amount is 250,000\nKES'
                     : (_selectedTab == 2
                         ? 'Minimum withdraw amount is 10 USD'
                         : 'Available balance is 0.00 USD'),
@@ -789,6 +800,7 @@ class _WithdrawPageState extends State<WithdrawPage> {
                   color: isLimitReached ? Colors.redAccent : textColor,
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
+                  height: 1.4,
                 ),
               ),
 

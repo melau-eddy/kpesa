@@ -12,6 +12,7 @@ class _DepositPageState extends State<DepositPage> {
   int _selectedTab = 0;
   String _amountStr = '0';
   bool _isKesInput = true;
+  bool _showLimitError = false;
 
   static const _accent = Color.fromARGB(255, 55, 194, 21);
   static const double _exchangeRate = 133.77375;
@@ -52,6 +53,9 @@ class _DepositPageState extends State<DepositPage> {
       
       if (kesVal <= 250000) {
         _amountStr = newStr;
+        _showLimitError = (kesVal >= 250000);
+      } else {
+        _showLimitError = true;
       }
     });
   }
@@ -62,6 +66,13 @@ class _DepositPageState extends State<DepositPage> {
         _amountStr = _amountStr.substring(0, _amountStr.length - 1);
       } else {
         _amountStr = '0';
+      }
+
+      // Reset error if we are now under the limit
+      final parsed = double.tryParse(_amountStr) ?? 0;
+      final kesVal = _isKesInput ? parsed : (parsed * _exchangeRate);
+      if (kesVal < 250000) {
+        _showLimitError = false;
       }
     });
   }
@@ -402,8 +413,8 @@ class _DepositPageState extends State<DepositPage> {
 
     final usdVal = _usdAmount;
     final kesVal = _kesAmount;
-    final isLimitReached = kesVal >= 250000;
-    final canDeposit = usdVal >= 5 && !isLimitReached;
+    final isLimitReached = _showLimitError || kesVal >= 250000;
+    final canDeposit = usdVal >= 5 && kesVal <= 250000;
 
     return Scaffold(
       backgroundColor: isDark ? const Color(0xFF131313) : Colors.white,
@@ -558,13 +569,15 @@ class _DepositPageState extends State<DepositPage> {
               // ── Minimum/Maximum deposit note ───────────────────────
               Text(
                 isLimitReached
-                    ? 'Maximum deposit amount is 250,000 KES'
+                    ? 'Maximum deposit amount is 250,000\nKES'
                     : 'Minimum deposit amount is 5 USD',
                 style: TextStyle(
                   color: isLimitReached ? Colors.redAccent : textColor,
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
+                  height: 1.4,
                 ),
+                textAlign: TextAlign.center,
               ),
 
               const Spacer(),
