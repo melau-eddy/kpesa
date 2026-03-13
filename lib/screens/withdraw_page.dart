@@ -7,21 +7,19 @@ class WithdrawPage extends StatefulWidget {
   @override
   State<WithdrawPage> createState() => _WithdrawPageState();
 }
-
 class _WithdrawPageState extends State<WithdrawPage> {
   // 0 = Deriv, 1 = MT5, 2 = Binance
   int _selectedTab = 0;
   String _amountStr = '0';
   bool _isKesInput = false;
+  bool _isWithdrawDialogVisible = true;
+  bool _isMpesaSelected = false;
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (_selectedTab == 0) {
-        _showWithdrawDialog();
-      }
-    });
+    // Instead of showGeneralDialog, we now use an internal overlay 
+    // that built into the Stack for perfect synchronization.
   }
 
   static const _accent = Color.fromARGB(255, 55, 194, 21);
@@ -44,17 +42,25 @@ class _WithdrawPageState extends State<WithdrawPage> {
 
   void _onDigit(String digit) {
     setState(() {
+      String newStr = _amountStr;
       if (digit == '.') {
         if (!_amountStr.contains('.')) {
-          _amountStr += '.';
+          newStr += '.';
         }
-        return;
+      } else {
+        if (_amountStr == '0') {
+          newStr = digit;
+        } else if (_amountStr.length < 12) {
+          newStr += digit;
+        }
       }
 
-      if (_amountStr == '0') {
-        _amountStr = digit;
-      } else if (_amountStr.length < 12) {
-        _amountStr += digit;
+      // Check if new value exceeds 250,000 KES
+      final parsed = double.tryParse(newStr) ?? 0;
+      final kesVal = _isKesInput ? parsed : (parsed * _exchangeRate);
+      
+      if (kesVal <= 250000) {
+        _amountStr = newStr;
       }
     });
   }
@@ -69,190 +75,152 @@ class _WithdrawPageState extends State<WithdrawPage> {
     });
   }
 
-  void _showWithdrawDialog() {
-    bool _isMpesaSelected = false; // Move state variable outside
-
-    showGeneralDialog(
-      context: context,
-      barrierDismissible: true,
-      barrierLabel: 'Dismiss',
-      transitionDuration: const Duration(milliseconds: 500),
-      pageBuilder: (context, anim1, anim2) => const SizedBox.shrink(),
-      transitionBuilder: (context, anim1, anim2, child) {
-        final isDark = Theme.of(context).brightness == Brightness.dark;
-        final textColor = isDark ? Colors.white : Colors.black87;
-        final cardBg = isDark
-            ? const Color(0xFF232323)
-            : const Color.fromARGB(255, 240, 240, 240);
-        final subtleColor = isDark ? Colors.white70 : Colors.black54;
-
-        return FadeTransition(
-          opacity: anim1,
-          child: SlideTransition(
-            position: Tween<Offset>(
-              begin: const Offset(0, 1),
-              end: Offset.zero,
-            ).animate(
-              CurvedAnimation(parent: anim1, curve: Curves.easeOutBack),
+  Widget _buildWithdrawAccountChoiceOverlay(bool isDark, Color textColor, Color cardBg, Color subtleColor) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          'Choose Account',
+          style: TextStyle(
+            color: textColor,
+            fontSize: 20,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        const SizedBox(height: 12),
+        Text(
+          'You can set your default withdraw account in the account setting page.',
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            color: textColor,
+            fontSize: 14,
+            height: 1.4,
+          ),
+        ),
+        const SizedBox(height: 24),
+        
+        // M-PESA Account Option
+        GestureDetector(
+          onTap: () {
+            setState(() {
+              _isMpesaSelected = !_isMpesaSelected;
+            });
+          },
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            decoration: BoxDecoration(
+              color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
+              border: Border.all(
+                color: _isMpesaSelected
+                    ? _accent // K-Pesa Green highlight
+                    : (isDark ? Colors.white10 : Colors.black12),
+              ),
+              borderRadius: BorderRadius.circular(16),
             ),
-            child: Dialog(
-              backgroundColor: cardBg,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: StatefulBuilder(
-                builder: (BuildContext context, StateSetter setState) {
-                  return Padding(
-                    padding: const EdgeInsets.all(24.0),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          'Choose Account',
-                          style: TextStyle(
-                            color: textColor,
-                            fontSize: 20,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-                        Text(
-                          'You can set your default withdraw account in the account setting page.',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: textColor,
-                            fontSize: 14,
-                            height: 1.4,
-                          ),
-                        ),
-                        const SizedBox(height: 24),
-                        
-                        // M-PESA Account Option
-                        GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              _isMpesaSelected = !_isMpesaSelected;
-                            });
-                          },
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                            decoration: BoxDecoration(
-                              color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
-                              border: Border.all(
-                                color: _isMpesaSelected
-                                    ? _accent // K-Pesa Green highlight
-                                    : (isDark ? Colors.white10 : Colors.black12),
-                              ),
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                            child: Row(
-                              children: [
-                                // Placeholder for M-PESA logo (using text for now)
-                                Text(
-                                  'M-PESA',
-                                  style: TextStyle(
-                                    color: Colors.greenAccent[700],
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 12,
-                                  ),
-                                ),
-                                const SizedBox(width: 16),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'M-PESA',
-                                      style: TextStyle(
-                                        color: textColor,
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      '254793814776',
-                                      style: TextStyle(
-                                        color: textColor,
-                                        fontSize: 12,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const Spacer(),
-                                // Radio button outline
-                                Container(
-                                  width: 20,
-                                  height: 20,
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: _isMpesaSelected
-                                        ? _accent
-                                        : Colors.transparent,
-                                    border: Border.all(
-                                      color: _isMpesaSelected
-                                          ? _accent
-                                          : subtleColor,
-                                      width: 2,
-                                    ),
-                                  ),
-                                  child: _isMpesaSelected
-                                      ? const Icon(
-                                          Icons.check,
-                                          size: 14,
-                                          color: Colors.white,
-                                        )
-                                      : null,
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-
-                        const SizedBox(height: 32),
-
-                        // Proceed Button
-                        TextButton(
-                          onPressed: _isMpesaSelected
-                              ? () {
-                                  Navigator.pop(context);
-                                }
-                              : null,
-                          child: Text(
-                            'Proceed',
-                            style: TextStyle(
-                              color: _isMpesaSelected
-                                  ? _accent
-                                  : Colors.white38, // Dimmed as in screenshot
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-
-                        const SizedBox(height: 12),
-
-                        // Cancel Withdrawal Button
-                        TextButton(
-                          onPressed: () => Navigator.pop(context),
-                          child: const Text(
-                            'Cancel Withdrawal',
-                            style: TextStyle(
-                              color: _accent, // K-Pesa Green
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                      ],
+            child: Row(
+              children: [
+                // Placeholder for M-PESA logo (using text for now)
+                Text(
+                  'M-PESA',
+                  style: TextStyle(
+                    color: Colors.greenAccent[700],
+                    fontWeight: FontWeight.bold,
+                    fontSize: 12,
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'M-PESA',
+                      style: TextStyle(
+                        color: textColor,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
-                  );
-                },
-              ),
+                    const SizedBox(height: 4),
+                    Text(
+                      '254793814776',
+                      style: TextStyle(
+                        color: textColor,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ),
+                const Spacer(),
+                // Radio button outline
+                Container(
+                  width: 20,
+                  height: 20,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: _isMpesaSelected
+                        ? _accent
+                        : Colors.transparent,
+                    border: Border.all(
+                      color: _isMpesaSelected
+                          ? _accent
+                          : subtleColor,
+                      width: 2,
+                    ),
+                  ),
+                  child: _isMpesaSelected
+                      ? const Icon(
+                          Icons.check,
+                          size: 14,
+                          color: Colors.white,
+                        )
+                      : null,
+                ),
+              ],
             ),
           ),
-        );
-      },
+        ),
+
+        const SizedBox(height: 32),
+
+        // Proceed Button
+        TextButton(
+          onPressed: _isMpesaSelected
+              ? () {
+                  setState(() => _isWithdrawDialogVisible = false);
+                }
+              : null,
+          child: Text(
+            'Proceed',
+            style: TextStyle(
+              color: _isMpesaSelected
+                  ? _accent
+                  : Colors.white38, // Dimmed as in screenshot
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+
+        const SizedBox(height: 12),
+
+        // Cancel Withdrawal Button
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text(
+            'Cancel Withdrawal',
+            style: TextStyle(
+              color: _accent, // K-Pesa Green
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+      ],
     );
+  }
+
+  void _showWithdrawDialog() {
+    setState(() => _isWithdrawDialogVisible = true);
   }
 
   void _showMT5LinkDialog() {
@@ -260,7 +228,7 @@ class _WithdrawPageState extends State<WithdrawPage> {
       context: context,
       barrierDismissible: true,
       barrierLabel: 'Dismiss',
-      transitionDuration: const Duration(milliseconds: 500),
+      transitionDuration: const Duration(milliseconds: 600),
       pageBuilder: (context, anim1, anim2) => const SizedBox.shrink(),
       transitionBuilder: (context, anim1, anim2, child) {
         final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -396,7 +364,7 @@ class _WithdrawPageState extends State<WithdrawPage> {
       context: context,
       barrierDismissible: true,
       barrierLabel: 'Dismiss',
-      transitionDuration: const Duration(milliseconds: 500),
+      transitionDuration: const Duration(milliseconds: 600),
       pageBuilder: (context, anim1, anim2) => const SizedBox.shrink(),
       transitionBuilder: (context, anim1, anim2, child) {
         final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -544,7 +512,7 @@ class _WithdrawPageState extends State<WithdrawPage> {
       context: context,
       barrierDismissible: true,
       barrierLabel: 'Dismiss',
-      transitionDuration: const Duration(milliseconds: 500),
+      transitionDuration: const Duration(milliseconds: 600),
       pageBuilder: (context, anim1, anim2) => const SizedBox.shrink(),
       transitionBuilder: (context, anim1, anim2, child) {
         final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -656,9 +624,10 @@ class _WithdrawPageState extends State<WithdrawPage> {
 
     final usdVal = _usdAmount;
     final kesVal = _kesAmount;
-    final canWithdraw = _selectedTab == 2 ? usdVal >= 10 : usdVal >= 5;
+    final isLimitReached = kesVal >= 250000;
+    final canWithdraw = (_selectedTab == 2 ? usdVal >= 10 : usdVal >= 5) && !isLimitReached;
 
-    return Scaffold(
+    final scaffold = Scaffold(
       backgroundColor: isDark ? const Color(0xFF131313) : Colors.white,
       body: SafeArea(
         child: Padding(
@@ -686,7 +655,7 @@ class _WithdrawPageState extends State<WithdrawPage> {
                 ],
               ),
 
-              const SizedBox(height: 24), // Replaced 48 with 24 to fix overflow
+              const SizedBox(height: 24),
 
               // ── "To" section ────────────────────────────────
               Center(
@@ -702,7 +671,7 @@ class _WithdrawPageState extends State<WithdrawPage> {
 
               const SizedBox(height: 24),
 
-              // ── Amount display (Converted USD) ────────────
+              // ── Amount display ────────────
               Stack(
                 alignment: Alignment.center,
                 clipBehavior: Clip.none,
@@ -777,7 +746,7 @@ class _WithdrawPageState extends State<WithdrawPage> {
 
               const SizedBox(height: 24),
 
-              // ── Input Amount (centered with divider) ─────────
+              // ── Input Amount ─────────
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -800,21 +769,24 @@ class _WithdrawPageState extends State<WithdrawPage> {
                   ),
                 ],
               ),
+              
               const SizedBox(height: 12),
               Divider(
                 color: isDark ? Colors.white24 : Colors.black26,
                 thickness: 1,
               ),
-
               const SizedBox(height: 12),
 
               // ── Dynamic Info Note ───────────────────────
               Text(
-                _selectedTab == 2
-                    ? 'Minimum withdraw amount is 10 USD'
-                    : 'Available balance is 0.00 USD',
+                isLimitReached
+                    ? 'Maximum withdrawal amount is 250,000 KES'
+                    : (_selectedTab == 2
+                        ? 'Minimum withdraw amount is 10 USD'
+                        : 'Available balance is 0.00 USD'),
+                textAlign: TextAlign.center,
                 style: TextStyle(
-                  color: textColor,
+                  color: isLimitReached ? Colors.redAccent : textColor,
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
                 ),
@@ -822,12 +794,10 @@ class _WithdrawPageState extends State<WithdrawPage> {
 
               const Spacer(),
 
-              // ── Number pad ─────────────────────────────────
               _buildNumberPad(keyBg, textColor),
 
               const SizedBox(height: 24),
 
-              // ── Withdraw button ─────────────────────────────
               SizedBox(
                 width: double.infinity,
                 height: 54,
@@ -863,29 +833,62 @@ class _WithdrawPageState extends State<WithdrawPage> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       const Spacer(),
-                      Text(
+                      const Text(
                         'Withdraw',
                         style: TextStyle(
-                          color: canWithdraw ? Colors.white : Colors.white24,
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       const Spacer(),
-                      Icon(
-                        Icons.chevron_right,
-                        color: canWithdraw ? Colors.white : Colors.white24,
-                        size: 20,
-                      ),
+                      const Icon(Icons.chevron_right, size: 20),
                     ],
                   ),
                 ),
               ),
-
               const SizedBox(height: 16),
             ],
           ),
         ),
+      ),
+    );
+
+    return PopScope(
+      canPop: !_isWithdrawDialogVisible,
+      onPopInvokedWithResult: (didPop, result) {
+        if (!didPop && _isWithdrawDialogVisible) {
+          setState(() => _isWithdrawDialogVisible = false);
+        }
+      },
+      child: Stack(
+        children: [
+          scaffold,
+          if (_isWithdrawDialogVisible) ...[
+            FadeTransition(
+              opacity: ModalRoute.of(context)!.animation!,
+              child: GestureDetector(
+                onTap: () => Navigator.pop(context),
+                child: Container(
+                  color: Colors.black54,
+                ),
+              ),
+            ),
+            Center(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 40),
+                child: Material(
+                  color: cardBg,
+                  borderRadius: BorderRadius.circular(16),
+                  elevation: 24,
+                  child: Padding(
+                    padding: const EdgeInsets.all(24.0),
+                    child: _buildWithdrawAccountChoiceOverlay(isDark, textColor, cardBg, subtleColor),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ],
       ),
     );
   }

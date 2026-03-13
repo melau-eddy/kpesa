@@ -32,21 +32,26 @@ class _DepositPageState extends State<DepositPage> {
   }
 
   void _onDigit(String digit) {
-    // If already at or over the maximum limit (250,000 KES), stop accepting new digits.
-    if (_kesAmount >= 250000) return;
-
     setState(() {
+      String newStr = _amountStr;
       if (digit == '.') {
         if (!_amountStr.contains('.')) {
-          _amountStr += '.';
+          newStr += '.';
         }
-        return;
+      } else {
+        if (_amountStr == '0') {
+          newStr = digit;
+        } else if (_amountStr.length < 12) {
+          newStr += digit;
+        }
       }
 
-      if (_amountStr == '0') {
-        _amountStr = digit;
-      } else if (_amountStr.length < 12) {
-        _amountStr += digit;
+      // Check if new value exceeds 250,000 KES
+      final parsed = double.tryParse(newStr) ?? 0;
+      final kesVal = _isKesInput ? parsed : (parsed * _exchangeRate);
+      
+      if (kesVal <= 250000) {
+        _amountStr = newStr;
       }
     });
   }
@@ -68,7 +73,7 @@ class _DepositPageState extends State<DepositPage> {
       context: context,
       barrierDismissible: true,
       barrierLabel: 'Dismiss',
-      transitionDuration: const Duration(milliseconds: 300),
+      transitionDuration: const Duration(milliseconds: 600),
       pageBuilder: (context, anim1, anim2) => const SizedBox.shrink(),
       transitionBuilder: (context, anim1, anim2, child) {
         final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -80,8 +85,11 @@ class _DepositPageState extends State<DepositPage> {
 
         return FadeTransition(
           opacity: anim1,
-          child: ScaleTransition(
-            scale: Tween<double>(begin: 0.9, end: 1.0).animate(
+          child: SlideTransition(
+            position: Tween<Offset>(
+              begin: const Offset(0, 1),
+              end: Offset.zero,
+            ).animate(
               CurvedAnimation(parent: anim1, curve: Curves.easeOutBack),
             ),
             child: Dialog(
@@ -249,7 +257,7 @@ class _DepositPageState extends State<DepositPage> {
       context: context,
       barrierDismissible: true,
       barrierLabel: 'Dismiss',
-      transitionDuration: const Duration(milliseconds: 300),
+      transitionDuration: const Duration(milliseconds: 600),
       pageBuilder: (context, anim1, anim2) => const SizedBox.shrink(),
       transitionBuilder: (context, anim1, anim2, child) {
         final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -260,8 +268,11 @@ class _DepositPageState extends State<DepositPage> {
 
         return FadeTransition(
           opacity: anim1,
-          child: ScaleTransition(
-            scale: Tween<double>(begin: 0.9, end: 1.0).animate(
+          child: SlideTransition(
+            position: Tween<Offset>(
+              begin: const Offset(0, 1),
+              end: Offset.zero,
+            ).animate(
               CurvedAnimation(parent: anim1, curve: Curves.easeOutBack),
             ),
             child: Dialog(
@@ -391,8 +402,8 @@ class _DepositPageState extends State<DepositPage> {
 
     final usdVal = _usdAmount;
     final kesVal = _kesAmount;
-    final isOverMax = kesVal > 250000;
-    final canDeposit = usdVal >= 5 && !isOverMax;
+    final isLimitReached = kesVal >= 250000;
+    final canDeposit = usdVal >= 5 && !isLimitReached;
 
     return Scaffold(
       backgroundColor: isDark ? const Color(0xFF131313) : Colors.white,
@@ -546,11 +557,11 @@ class _DepositPageState extends State<DepositPage> {
 
               // ── Minimum/Maximum deposit note ───────────────────────
               Text(
-                isOverMax
+                isLimitReached
                     ? 'Maximum deposit amount is 250,000 KES'
                     : 'Minimum deposit amount is 5 USD',
                 style: TextStyle(
-                  color: isOverMax ? Colors.white : textColor,
+                  color: isLimitReached ? Colors.redAccent : textColor,
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
                 ),
