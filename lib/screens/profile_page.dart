@@ -59,6 +59,12 @@ class ProfilePage extends StatelessWidget {
                   Center(
                     child: Column(
                       children: [
+                        const CircleAvatar(
+                          radius: 50,
+                          backgroundColor: Colors.transparent,
+                          child: Icon(Icons.account_circle, size: 100, color: Colors.grey),
+                        ),
+                        const SizedBox(height: 16),
                         Text(
                           'Eddy Kimani',
                           style: TextStyle(
@@ -67,7 +73,7 @@ class ProfilePage extends StatelessWidget {
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        const SizedBox(height: 8),
+                        const SizedBox(height: 4),
                         Text(
                           'eddymutugik@gmail.com',
                           style: TextStyle(
@@ -80,7 +86,7 @@ class ProfilePage extends StatelessWidget {
                           'CR10125517',
                           style: TextStyle(
                             color: subtleColor,
-                            fontSize: 14,
+                            fontSize: 16,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
@@ -185,7 +191,7 @@ class ProfilePage extends StatelessWidget {
                   _buildMenuItem(
                     icon: Icons.settings_outlined,
                     title: 'Other Settings',
-                    subtitle: 'Theme, biometrics',
+                    subtitle: 'Theme, notifications',
                     cardBg: cardBg,
                     accentColor: accentColor,
                     textColor: textColor,
@@ -223,7 +229,7 @@ class ProfilePage extends StatelessWidget {
   }) {
     return Expanded(
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 8),
+        padding: const EdgeInsets.symmetric(vertical: 34, horizontal: 8),
         decoration: BoxDecoration(
           color: cardBg,
           borderRadius: BorderRadius.circular(24),
@@ -241,7 +247,7 @@ class ProfilePage extends StatelessWidget {
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
-                    color: accentColor.withValues(alpha: 0.4),
+                    color: accentColor.withValues(alpha: 0.3),
                     blurRadius: 10,
                     spreadRadius: 1,
                   ),
@@ -256,16 +262,16 @@ class ProfilePage extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(height: 18),
+            const SizedBox(height: 20),
             Text(
               amount,
               style: TextStyle(
                 color: textColor,
-                fontSize: 20,
+                fontSize: 24,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 10),
             Text(
               label,
               style: TextStyle(
@@ -291,65 +297,49 @@ class ProfilePage extends StatelessWidget {
     required bool isDark,
     bool showArrow = true,
   }) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: cardBg,
-          borderRadius: BorderRadius.circular(20),
-          boxShadow: isDark ? null : [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.02),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            )
-          ],
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      decoration: BoxDecoration(
+        color: cardBg,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: isDark ? null : [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.03),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          )
+        ],
+      ),
+      child: ListTile(
+        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+        leading: Container(
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: accentColor.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Icon(icon, color: accentColor, size: 24),
         ),
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: accentColor.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Icon(icon, color: accentColor, size: 24),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: TextStyle(
-                      color: textColor,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  if (subtitle != null) ...[
-                    const SizedBox(height: 2),
-                    Text(
-                      subtitle,
-                      style: TextStyle(
-                        color: subtleColor,
-                        fontSize: 13,
-                      ),
-                    ),
-                  ],
-                ],
-              ),
-            ),
-            if (showArrow)
-              Icon(
-                Icons.chevron_right,
-                color: accentColor.withValues(alpha: 0.7),
-                size: 20,
-              ),
-          ],
+        title: Text(
+          title,
+          style: TextStyle(
+            color: textColor,
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+          ),
         ),
+        subtitle: subtitle != null
+            ? Text(
+                subtitle,
+                style: TextStyle(
+                  color: subtleColor,
+                  fontSize: 13,
+                ),
+              )
+            : null,
+        trailing: showArrow
+            ? Icon(Icons.chevron_right, color: accentColor, size: 20)
+            : null,
       ),
     );
   }
