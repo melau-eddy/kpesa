@@ -4,12 +4,12 @@ class SmsService {
   // ── Africa's Talking credentials ─────────────────────────────────────────────
   static const _atUsername = 'cyberpark';
   static const _apiKey =
-      'atsk_d15ce90cb6fedbd0f8168634896a78752c60137484636ebf12b535dd19f2dcdc66fbce94';
+      'atsk_007a9d3d48eea35e78a31efc293f66bde0ef581298478b6493f1f7eca1d044be0f4eb07b';
   // Sender ID is omitted until "K-pesa" is registered with Africa's Talking.
   // Once registered, add  'from': 'K-pesa'  back into the request body below.
 
-  /// Sends a 6-digit [otp] to a Kenyan [phone] number via Africa's Talking SMS.
-  /// Returns true if AT accepted the request (HTTP 201).
+  /// Sends a 6-digit [otp] to a Kenyan [phone] number via Africa's Talking
+  /// Bulk SMS (Legacy) API. Returns true if AT accepted the request (HTTP 201).
   static Future<bool> sendOtp(String phone, String otp) async {
     final formatted = _formatKenyanPhone(phone);
     final message =
@@ -20,11 +20,16 @@ class SmsService {
       final response = await http
           .post(
             Uri.parse('https://api.africastalking.com/version1/messaging'),
-            headers: {'apiKey': _apiKey, 'Accept': 'application/json'},
+            headers: {
+              'apiKey': _apiKey,
+              'Accept': 'application/json',
+              'Content-Type': 'application/x-www-form-urlencoded',
+            },
             body: {
               'username': _atUsername,
               'to': formatted,
               'message': message,
+              'bulkSMSMode': '1',
               // 'from': 'K-pesa', // uncomment after registering the sender ID
             },
           )
@@ -37,16 +42,14 @@ class SmsService {
   }
 
   /// Converts a Kenyan phone number to E.164 format (+254XXXXXXXXX).
+  /// Input examples: 0712345678 → +254712345678
+  ///                 712345678  → +254712345678
+  ///                +254712345678 → +254712345678 (unchanged)
   static String _formatKenyanPhone(String phone) {
-    phone = phone.trim().replaceAll(' ', '').replaceAll('-', '');
-    if (phone.startsWith('07') || phone.startsWith('01')) {
-      return '+254${phone.substring(1)}';
-    }
-    if (phone.startsWith('7') || phone.startsWith('1')) {
-      return '+254$phone';
-    }
-    if (phone.startsWith('+254')) return phone;
-    return '+254$phone';
+    phone = phone.trim().replaceAll(RegExp(r'[\s\-]'), '');
+    if (phone.startsWith('+254')) return phone;          // already E.164
+    if (phone.startsWith('0')) return '+254${phone.substring(1)}'; // 07... → +2547...
+    return '+254$phone';                                  // 7... → +2547...
   }
 }
 
