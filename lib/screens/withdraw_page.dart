@@ -76,7 +76,7 @@ class _WithdrawPageState extends State<WithdrawPage> {
       context: context,
       barrierDismissible: true,
       barrierLabel: 'Dismiss',
-      transitionDuration: const Duration(milliseconds: 300),
+      transitionDuration: const Duration(milliseconds: 500),
       pageBuilder: (context, anim1, anim2) => const SizedBox.shrink(),
       transitionBuilder: (context, anim1, anim2, child) {
         final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -88,8 +88,11 @@ class _WithdrawPageState extends State<WithdrawPage> {
 
         return FadeTransition(
           opacity: anim1,
-          child: ScaleTransition(
-            scale: Tween<double>(begin: 0.9, end: 1.0).animate(
+          child: SlideTransition(
+            position: Tween<Offset>(
+              begin: const Offset(0, 1),
+              end: Offset.zero,
+            ).animate(
               CurvedAnimation(parent: anim1, curve: Curves.easeOutBack),
             ),
             child: Dialog(
@@ -257,7 +260,7 @@ class _WithdrawPageState extends State<WithdrawPage> {
       context: context,
       barrierDismissible: true,
       barrierLabel: 'Dismiss',
-      transitionDuration: const Duration(milliseconds: 300),
+      transitionDuration: const Duration(milliseconds: 500),
       pageBuilder: (context, anim1, anim2) => const SizedBox.shrink(),
       transitionBuilder: (context, anim1, anim2, child) {
         final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -268,8 +271,11 @@ class _WithdrawPageState extends State<WithdrawPage> {
 
         return FadeTransition(
           opacity: anim1,
-          child: ScaleTransition(
-            scale: Tween<double>(begin: 0.9, end: 1.0).animate(
+          child: SlideTransition(
+            position: Tween<Offset>(
+              begin: const Offset(0, 1),
+              end: Offset.zero,
+            ).animate(
               CurvedAnimation(parent: anim1, curve: Curves.easeOutBack),
             ),
             child: Dialog(
@@ -390,7 +396,7 @@ class _WithdrawPageState extends State<WithdrawPage> {
       context: context,
       barrierDismissible: true,
       barrierLabel: 'Dismiss',
-      transitionDuration: const Duration(milliseconds: 300),
+      transitionDuration: const Duration(milliseconds: 500),
       pageBuilder: (context, anim1, anim2) => const SizedBox.shrink(),
       transitionBuilder: (context, anim1, anim2, child) {
         final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -401,8 +407,11 @@ class _WithdrawPageState extends State<WithdrawPage> {
 
         return FadeTransition(
           opacity: anim1,
-          child: ScaleTransition(
-            scale: Tween<double>(begin: 0.9, end: 1.0).animate(
+          child: SlideTransition(
+            position: Tween<Offset>(
+              begin: const Offset(0, 1),
+              end: Offset.zero,
+            ).animate(
               CurvedAnimation(parent: anim1, curve: Curves.easeOutBack),
             ),
             child: Dialog(
@@ -535,7 +544,7 @@ class _WithdrawPageState extends State<WithdrawPage> {
       context: context,
       barrierDismissible: true,
       barrierLabel: 'Dismiss',
-      transitionDuration: const Duration(milliseconds: 300),
+      transitionDuration: const Duration(milliseconds: 500),
       pageBuilder: (context, anim1, anim2) => const SizedBox.shrink(),
       transitionBuilder: (context, anim1, anim2, child) {
         final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -547,8 +556,11 @@ class _WithdrawPageState extends State<WithdrawPage> {
 
         return FadeTransition(
           opacity: anim1,
-          child: ScaleTransition(
-            scale: Tween<double>(begin: 0.9, end: 1.0).animate(
+          child: SlideTransition(
+            position: Tween<Offset>(
+              begin: const Offset(0, 1),
+              end: Offset.zero,
+            ).animate(
               CurvedAnimation(parent: anim1, curve: Curves.easeOutBack),
             ),
             child: Dialog(
