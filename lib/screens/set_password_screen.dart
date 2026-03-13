@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../models/signup_data.dart';
+import 'home_page.dart';
 
 class SetPasswordScreen extends StatefulWidget {
   final SignupData signupData;
@@ -184,10 +185,13 @@ class _SetPasswordScreenState extends State<SetPasswordScreen> {
               ),
             ),
             onPressed: () {
-              // TODO: navigate to home screen
-              Navigator.of(ctx).pop();
-            },
-            child: const Text('Go to Home'), // TODO: wired to HomeScreen
+                Navigator.of(ctx).pop(); // close dialog
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(builder: (_) => const HomePage()),
+                  (_) => false, // clear entire back stack
+                );
+              },
+              child: const Text('Go to Home'),
           ),
         ],
       ),
