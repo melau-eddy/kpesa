@@ -494,6 +494,94 @@ class _WithdrawPageState extends State<WithdrawPage> {
     );
   }
 
+  void _showInsufficientBalanceDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        final isDark = Theme.of(context).brightness == Brightness.dark;
+        final textColor = isDark ? Colors.white : Colors.black87;
+        final cardBg = isDark
+            ? const Color(0xFF232323)
+            : const Color.fromARGB(255, 240, 240, 240);
+        final dividerColor = isDark ? Colors.white10 : Colors.black12;
+
+        return Dialog(
+          backgroundColor: cardBg,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(24, 32, 24, 24),
+                child: Column(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: _accent.withValues(alpha: 0.1),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.error_outline_rounded,
+                        color: _accent,
+                        size: 32,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    Text(
+                      'Error',
+                      style: TextStyle(
+                        color: textColor,
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      'Insufficient balance. Please refresh your account or try switching to a different source (MT5 or Deriv).',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: textColor.withValues(alpha: 0.8),
+                        fontSize: 15,
+                        height: 1.5,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Divider(height: 1, color: dividerColor),
+              SizedBox(
+                width: double.infinity,
+                child: TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  style: TextButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 18),
+                    shape: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.only(
+                        bottomLeft: Radius.circular(16),
+                        bottomRight: Radius.circular(16),
+                      ),
+                    ),
+                  ),
+                  child: const Text(
+                    'Try again',
+                    style: TextStyle(
+                      color: _accent,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -508,7 +596,7 @@ class _WithdrawPageState extends State<WithdrawPage> {
 
     final usdVal = _usdAmount;
     final kesVal = _kesAmount;
-    final canWithdraw = usdVal >= 5;
+    final canWithdraw = _selectedTab == 2 ? usdVal >= 10 : usdVal >= 5;
 
     return Scaffold(
       backgroundColor: isDark ? const Color(0xFF131313) : Colors.white,
@@ -660,9 +748,11 @@ class _WithdrawPageState extends State<WithdrawPage> {
 
               const SizedBox(height: 12),
 
-              // ── Available balance note ───────────────────────
+              // ── Dynamic Info Note ───────────────────────
               Text(
-                'Available balance is 0.00 USD',
+                _selectedTab == 2
+                    ? 'Minimum withdraw amount is 10 USD'
+                    : 'Available balance is 0.00 USD',
                 style: TextStyle(
                   color: textColor,
                   fontSize: 14,
@@ -694,15 +784,19 @@ class _WithdrawPageState extends State<WithdrawPage> {
                   ),
                   onPressed: canWithdraw
                       ? () {
-                          final destination =
-                              ['Deriv', 'MT5', 'Binance'][_selectedTab];
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                'Withdrawing \$${usdVal.toStringAsFixed(2)} USD from $destination',
+                          if (_selectedTab == 0 || _selectedTab == 1) {
+                            _showInsufficientBalanceDialog();
+                          } else {
+                            final destination =
+                                ['Deriv', 'MT5', 'Binance'][_selectedTab];
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  'Withdrawing \$${usdVal.toStringAsFixed(2)} USD from $destination',
+                                ),
                               ),
-                            ),
-                          );
+                            );
+                          }
                         }
                       : null,
                   child: Row(
