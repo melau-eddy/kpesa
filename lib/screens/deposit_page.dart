@@ -61,9 +61,13 @@ class _DepositPageState extends State<DepositPage> {
   void _showDepositDialog() {
     bool _isMpesaSelected = false; // Move state variable outside
 
-    showDialog(
+    showGeneralDialog(
       context: context,
-      builder: (BuildContext context) {
+      barrierDismissible: true,
+      barrierLabel: 'Dismiss',
+      transitionDuration: const Duration(milliseconds: 300),
+      pageBuilder: (context, anim1, anim2) => const SizedBox.shrink(),
+      transitionBuilder: (context, anim1, anim2, child) {
         final isDark = Theme.of(context).brightness == Brightness.dark;
         final textColor = isDark ? Colors.white : Colors.black87;
         final cardBg = isDark
@@ -71,158 +75,166 @@ class _DepositPageState extends State<DepositPage> {
             : const Color.fromARGB(255, 240, 240, 240);
         final subtleColor = isDark ? Colors.white70 : Colors.black54;
 
-        return Dialog(
-          backgroundColor: cardBg,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: StatefulBuilder(
-            builder: (BuildContext context, StateSetter setState) {
-              return Padding(
-                padding: const EdgeInsets.all(24.0),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      'Choose Account',
-                      style: TextStyle(
-                        color: textColor,
-                        fontSize: 20,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    Text(
-                      'You can set your default deposit account in the account setting page.',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: textColor,
-                        fontSize: 14,
-                        height: 1.4,
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-                    
-                    // M-PESA Account Option
-                    GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          _isMpesaSelected = !_isMpesaSelected;
-                        });
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                        decoration: BoxDecoration(
-                          color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
-                          border: Border.all(
-                            color: _isMpesaSelected
-                                ? _accent // K-Pesa Green highlight
-                                : (isDark ? Colors.white10 : Colors.black12),
+        return FadeTransition(
+          opacity: anim1,
+          child: ScaleTransition(
+            scale: Tween<double>(begin: 0.9, end: 1.0).animate(
+              CurvedAnimation(parent: anim1, curve: Curves.easeOutBack),
+            ),
+            child: Dialog(
+              backgroundColor: cardBg,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: StatefulBuilder(
+                builder: (BuildContext context, StateSetter setState) {
+                  return Padding(
+                    padding: const EdgeInsets.all(24.0),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          'Choose Account',
+                          style: TextStyle(
+                            color: textColor,
+                            fontSize: 20,
+                            fontWeight: FontWeight.w600,
                           ),
-                          borderRadius: BorderRadius.circular(16),
                         ),
-                        child: Row(
-                          children: [
-                            // Placeholder for M-PESA logo (using text for now)
-                            Text(
-                              'M-PESA',
-                              style: TextStyle(
-                                color: Colors.greenAccent[700],
-                                fontWeight: FontWeight.bold,
-                                fontSize: 12,
+                        const SizedBox(height: 12),
+                        Text(
+                          'You can set your default deposit account in the account setting page.',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: textColor,
+                            fontSize: 14,
+                            height: 1.4,
+                          ),
+                        ),
+                        const SizedBox(height: 24),
+                        
+                        // M-PESA Account Option
+                        GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              _isMpesaSelected = !_isMpesaSelected;
+                            });
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                            decoration: BoxDecoration(
+                              color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
+                              border: Border.all(
+                                color: _isMpesaSelected
+                                    ? _accent // K-Pesa Green highlight
+                                    : (isDark ? Colors.white10 : Colors.black12),
                               ),
+                              borderRadius: BorderRadius.circular(16),
                             ),
-                            const SizedBox(width: 16),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                            child: Row(
                               children: [
+                                // Placeholder for M-PESA logo (using text for now)
                                 Text(
                                   'M-PESA',
                                   style: TextStyle(
-                                    color: textColor,
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  '254793814776',
-                                  style: TextStyle(
-                                    color: textColor,
+                                    color: Colors.greenAccent[700],
+                                    fontWeight: FontWeight.bold,
                                     fontSize: 12,
                                   ),
                                 ),
+                                const SizedBox(width: 16),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'M-PESA',
+                                      style: TextStyle(
+                                        color: textColor,
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      '254793814776',
+                                      style: TextStyle(
+                                        color: textColor,
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const Spacer(),
+                                // Radio button outline
+                                Container(
+                                  width: 20,
+                                  height: 20,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: _isMpesaSelected
+                                        ? _accent
+                                        : Colors.transparent,
+                                    border: Border.all(
+                                      color: _isMpesaSelected
+                                          ? _accent
+                                          : subtleColor,
+                                      width: 2,
+                                    ),
+                                  ),
+                                  child: _isMpesaSelected
+                                      ? const Icon(
+                                          Icons.check,
+                                          size: 14,
+                                          color: Colors.white,
+                                        )
+                                      : null,
+                                ),
                               ],
                             ),
-                            const Spacer(),
-                            // Radio button outline
-                            Container(
-                              width: 20,
-                              height: 20,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: _isMpesaSelected
-                                    ? _accent
-                                    : Colors.transparent,
-                                border: Border.all(
-                                  color: _isMpesaSelected
-                                      ? _accent
-                                      : subtleColor,
-                                  width: 2,
-                                ),
-                              ),
-                              child: _isMpesaSelected
-                                  ? const Icon(
-                                      Icons.check,
-                                      size: 14,
-                                      color: Colors.white,
-                                    )
-                                  : null,
+                          ),
+                        ),
+
+                        const SizedBox(height: 32),
+
+                        // Proceed Button
+                        TextButton(
+                          onPressed: _isMpesaSelected
+                              ? () {
+                                  Navigator.pop(context);
+                                }
+                              : null,
+                          child: Text(
+                            'Proceed',
+                            style: TextStyle(
+                              color: _isMpesaSelected
+                                  ? _accent
+                                  : Colors.white38, // Dimmed as in screenshot
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
                             ),
-                          ],
+                          ),
                         ),
-                      ),
-                    ),
 
-                    const SizedBox(height: 32),
+                        const SizedBox(height: 12),
 
-                    // Proceed Button
-                    TextButton(
-                      onPressed: _isMpesaSelected
-                          ? () {
-                              Navigator.pop(context);
-                            }
-                          : null,
-                      child: Text(
-                        'Proceed',
-                        style: TextStyle(
-                          color: _isMpesaSelected
-                              ? _accent
-                              : Colors.white38, // Dimmed as in screenshot
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
+                        // Cancel Deposit Button
+                        TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: const Text(
+                            'Cancel Deposit',
+                            style: TextStyle(
+                              color: _accent, // K-Pesa Green
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
                         ),
-                      ),
+                      ],
                     ),
-
-                    const SizedBox(height: 12),
-
-                    // Cancel Deposit Button
-                    TextButton(
-                      onPressed: () => Navigator.pop(context),
-                      child: const Text(
-                        'Cancel Deposit',
-                        style: TextStyle(
-                          color: _accent, // K-Pesa Green
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            },
+                  );
+                },
+              ),
+            ),
           ),
         );
       },
@@ -230,120 +242,132 @@ class _DepositPageState extends State<DepositPage> {
   }
 
   void _showMT5LinkDialog() {
-    showDialog(
+    showGeneralDialog(
       context: context,
-      builder: (BuildContext context) {
+      barrierDismissible: true,
+      barrierLabel: 'Dismiss',
+      transitionDuration: const Duration(milliseconds: 300),
+      pageBuilder: (context, anim1, anim2) => const SizedBox.shrink(),
+      transitionBuilder: (context, anim1, anim2, child) {
         final isDark = Theme.of(context).brightness == Brightness.dark;
         final textColor = isDark ? Colors.white : Colors.black87;
         final cardBg = isDark
             ? const Color(0xFF232323)
             : const Color.fromARGB(255, 240, 240, 240);
 
-        return Dialog(
-          backgroundColor: cardBg,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(top: 24.0, bottom: 16.0, left: 16.0, right: 16.0),
-                child: Column(
-                  children: [
-                    Text(
-                      'Notice',
-                      style: TextStyle(
-                        color: textColor,
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    Text(
-                      'Please select the MT5 account that you wish to link to your D M-PESA account',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: textColor,
-                        fontSize: 15,
-                        height: 1.4,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
-                ),
+        return FadeTransition(
+          opacity: anim1,
+          child: ScaleTransition(
+            scale: Tween<double>(begin: 0.9, end: 1.0).animate(
+              CurvedAnimation(parent: anim1, curve: Curves.easeOutBack),
+            ),
+            child: Dialog(
+              backgroundColor: cardBg,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
               ),
-              
-              // Divider line above buttons
-              Divider(
-                color: isDark ? Colors.white10 : Colors.black12,
-                thickness: 1,
-                height: 1,
-              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(top: 24.0, bottom: 16.0, left: 16.0, right: 16.0),
+                    child: Column(
+                      children: [
+                        Text(
+                          'Notice',
+                          style: TextStyle(
+                            color: textColor,
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          'Please select the MT5 account that you wish to link to your D M-PESA account',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: textColor,
+                            fontSize: 15,
+                            height: 1.4,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  
+                  // Divider line above buttons
+                  Divider(
+                    color: isDark ? Colors.white10 : Colors.black12,
+                    thickness: 1,
+                    height: 1,
+                  ),
 
-              // Bottom Buttons Row
-              IntrinsicHeight(
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: TextButton(
-                        onPressed: () {
-                          // TODO: Implement actual select linking
-                          Navigator.pop(context);
-                          setState(() => _selectedTab = 1);
-                        },
-                        style: TextButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.only(
-                              bottomLeft: Radius.circular(16),
+                  // Bottom Buttons Row
+                  IntrinsicHeight(
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: TextButton(
+                            onPressed: () {
+                              // TODO: Implement actual select linking
+                              Navigator.pop(context);
+                              setState(() => _selectedTab = 1);
+                            },
+                            style: TextButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(vertical: 16),
+                              shape: const RoundedRectangleBorder(
+                                borderRadius: BorderRadius.only(
+                                  bottomLeft: Radius.circular(16),
+                                ),
+                              ),
+                            ),
+                            child: const Text(
+                              'Select',
+                              style: TextStyle(
+                                color: _accent, // K-Pesa Green
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                           ),
                         ),
-                        child: const Text(
-                          'Select',
-                          style: TextStyle(
-                            color: _accent, // K-Pesa Green
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                          ),
+                        VerticalDivider(
+                          color: isDark ? Colors.white10 : Colors.black12,
+                          thickness: 1,
+                          width: 1,
                         ),
-                      ),
-                    ),
-                    VerticalDivider(
-                      color: isDark ? Colors.white10 : Colors.black12,
-                      thickness: 1,
-                      width: 1,
-                    ),
-                    Expanded(
-                      child: TextButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                          // Revert selection if user declines
-                          setState(() => _selectedTab = 0);
-                        },
-                        style: TextButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.only(
-                              bottomRight: Radius.circular(16),
+                        Expanded(
+                          child: TextButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                              // Revert selection if user declines
+                              setState(() => _selectedTab = 0);
+                            },
+                            style: TextButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(vertical: 16),
+                              shape: const RoundedRectangleBorder(
+                                borderRadius: BorderRadius.only(
+                                  bottomRight: Radius.circular(16),
+                                ),
+                              ),
+                            ),
+                            child: const Text(
+                              'Not Now',
+                              style: TextStyle(
+                                color: _accent, // K-Pesa Green
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                           ),
                         ),
-                        child: const Text(
-                          'Not Now',
-                          style: TextStyle(
-                            color: _accent, // K-Pesa Green
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
+                      ],
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
         );
       },
@@ -364,7 +388,8 @@ class _DepositPageState extends State<DepositPage> {
 
     final usdVal = _usdAmount;
     final kesVal = _kesAmount;
-    final canDeposit = usdVal >= 5;
+    final isOverMax = kesVal > 250000;
+    final canDeposit = usdVal >= 5 && !isOverMax;
 
     return Scaffold(
       backgroundColor: isDark ? const Color(0xFF131313) : Colors.white,
@@ -516,11 +541,13 @@ class _DepositPageState extends State<DepositPage> {
 
               const SizedBox(height: 12),
 
-              // ── Minimum deposit note ───────────────────────
+              // ── Minimum/Maximum deposit note ───────────────────────
               Text(
-                'Minimum deposit amount is 5 USD',
+                isOverMax
+                    ? 'Maximum deposit amount is 250,000 KES'
+                    : 'Minimum deposit amount is 5 USD',
                 style: TextStyle(
-                  color: textColor,
+                  color: isOverMax ? Colors.white : textColor,
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
                 ),
@@ -675,31 +702,34 @@ class _DepositPageState extends State<DepositPage> {
       if (key.isEmpty) {
         child = const SizedBox.shrink();
       } else {
-        child = GestureDetector(
-          onTap: () {
-            if (key == '⌫') {
-              _onBackspace();
-            } else {
-              _onDigit(key);
-            }
-          },
-          child: Container(
-            height: keyHeight,
-            decoration: BoxDecoration(
-              color: keyBg,
-              borderRadius: BorderRadius.circular(24),
-            ),
-            alignment: Alignment.center,
-            child: key == '⌫'
-                ? Icon(Icons.backspace_outlined, color: textColor, size: 24)
-                : Text(
-                    key,
-                    style: TextStyle(
-                      color: textColor,
-                      fontSize: 24,
-                      fontWeight: FontWeight.w600,
+        child = Material(
+          color: keyBg,
+          borderRadius: BorderRadius.circular(24),
+          clipBehavior: Clip.antiAlias,
+          child: InkWell(
+            onTap: () {
+              if (key == '⌫') {
+                _onBackspace();
+              } else {
+                _onDigit(key);
+              }
+            },
+            splashColor: _accent.withValues(alpha: 0.2),
+            highlightColor: _accent.withValues(alpha: 0.1),
+            child: Container(
+              height: keyHeight,
+              alignment: Alignment.center,
+              child: key == '⌫'
+                  ? Icon(Icons.backspace_outlined, color: textColor, size: 24)
+                  : Text(
+                      key,
+                      style: TextStyle(
+                        color: textColor,
+                        fontSize: 24,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
-                  ),
+            ),
           ),
         );
       }
