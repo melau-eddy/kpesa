@@ -157,9 +157,21 @@ class _MpesaPhoneScreenState extends State<MpesaPhoneScreen> {
       // ── Phone path: send OTP via Africa's Talking ───────────────────────────
       setState(() => _isSending = true);
       final otp = _generateOtp();
-      await SmsService.sendOtp(phone, otp);
+      final sent = await SmsService.sendOtp(phone, otp);
       if (!mounted) return;
       setState(() => _isSending = false);
+
+      if (!sent) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Could not send OTP. Check your number and try again.',
+            ),
+            backgroundColor: Colors.red,
+          ),
+        );
+        return;
+      }
 
       Navigator.of(context).push(
         MaterialPageRoute(

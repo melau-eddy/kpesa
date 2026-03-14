@@ -30,7 +30,8 @@ class SmsService {
               'to': formatted,
               'message': message,
               'bulkSMSMode': '1',
-              //'from': 'K-pesa', // uncomment after registering the sender ID
+              'from':
+                  'AFRICASTKNG', // uncomment after registering the sender ID
             },
           )
           .timeout(const Duration(seconds: 15));
