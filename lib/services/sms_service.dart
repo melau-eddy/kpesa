@@ -30,7 +30,7 @@ class SmsService {
               'to': formatted,
               'message': message,
               'bulkSMSMode': '1',
-              // 'from': 'K-pesa', // uncomment after registering the sender ID
+              //'from': 'K-pesa', // uncomment after registering the sender ID
             },
           )
           .timeout(const Duration(seconds: 15));
@@ -47,9 +47,9 @@ class SmsService {
   ///                +254712345678 → +254712345678 (unchanged)
   static String _formatKenyanPhone(String phone) {
     phone = phone.trim().replaceAll(RegExp(r'[\s\-]'), '');
-    if (phone.startsWith('+254')) return phone;          // already E.164
-    if (phone.startsWith('0')) return '+254${phone.substring(1)}'; // 07... → +2547...
-    return '+254$phone';                                  // 7... → +2547...
+    if (phone.startsWith('+254')) return phone; // already E.164
+    if (phone.startsWith('0'))
+      return '+254${phone.substring(1)}'; // 07... → +2547...
+    return '+254$phone'; // 7... → +2547...
   }
 }
-

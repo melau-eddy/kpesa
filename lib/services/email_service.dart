@@ -4,7 +4,7 @@ import 'package:mailer/smtp_server/gmail.dart';
 class EmailService {
   // ── Gmail credentials ────────────────────────────────────────────────────────
   // Replace with YOUR Gmail address (the one you generated the App Password on).
-  static const _gmailAddress = 'georgesmars8@gmail.com';
+  static const _gmailAddress = 'otp@k-pesa.tech';
 
   // App Password generated from: Google Account → Security → App Passwords
   static const _appPassword = 'lwsj txuc qugq rkod';
