@@ -10,7 +10,7 @@ class PaymentProvidersPage extends StatelessWidget {
     final subtleColor = isDark ? Colors.white70 : Colors.black54;
     final bgColor = isDark ? const Color(0xFF131313) : const Color(0xFFF8F9FA);
     final cardBg = isDark ? const Color(0xFF1E1E1E) : Colors.white;
-    final accentColor = const Color.fromARGB(255, 55, 194, 21); // K-Pesa Green
+    final accentColor = const Color(0xFF6200EE); // Deep Purple to match screenshot chevrons
 
     return Scaffold(
       backgroundColor: bgColor,
@@ -107,15 +107,18 @@ class PaymentProvidersPage extends StatelessWidget {
       title,
       style: TextStyle(
         color: textColor,
-        fontSize: 22,
+        fontSize: 24,
         fontWeight: FontWeight.bold,
-        fontFamily: 'Comic Sans MS', // Matching the playful font in screenshot if available, else standard
+        // The mockup has a slightly playful/cursive header font. 
+        // We'll use a very bold weight and slightly tighter spacing to match the 'vibe'.
+        letterSpacing: -0.5,
       ),
     );
   }
 
   Widget _buildProviderCard({
-    required String logoPath,
+    String? logoPath,
+    Widget? customLogo,
     required String title,
     required String subtitle,
     required Color cardBg,
@@ -126,16 +129,20 @@ class PaymentProvidersPage extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: cardBg,
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(28),
       ),
       child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-        leading: Image.asset(
-          logoPath,
-          height: 40,
-          width: 80,
-          fit: BoxFit.contain,
-          errorBuilder: (ctx, err, stack) => Icon(Icons.account_balance_wallet, color: accentColor, size: 32),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+        leading: SizedBox(
+          width: 60,
+          child: Center(
+            child: customLogo ?? (logoPath != null ? Image.asset(
+              logoPath,
+              height: 42,
+              fit: BoxFit.contain,
+              errorBuilder: (ctx, err, stack) => Icon(Icons.account_balance_wallet, color: accentColor, size: 32),
+            ) : const SizedBox()),
+          ),
         ),
         title: Text(
           title,
@@ -145,14 +152,17 @@ class PaymentProvidersPage extends StatelessWidget {
             fontWeight: FontWeight.bold,
           ),
         ),
-        subtitle: Text(
-          subtitle,
-          style: TextStyle(
-            color: subtleColor,
-            fontSize: 14,
+        subtitle: Padding(
+          padding: const EdgeInsets.only(top: 4.0),
+          child: Text(
+            subtitle,
+            style: TextStyle(
+              color: subtleColor.withValues(alpha: 0.7),
+              fontSize: 14,
+            ),
           ),
         ),
-        trailing: Icon(Icons.chevron_right, color: accentColor.withValues(alpha: 0.6)),
+        trailing: Icon(Icons.chevron_right, color: accentColor, size: 22),
       ),
     );
   }
@@ -166,17 +176,13 @@ class PaymentProvidersPage extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: cardBg,
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(28),
       ),
       child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-        leading: Container(
-          padding: const EdgeInsets.all(10),
-          decoration: BoxDecoration(
-            color: accentColor.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Icon(Icons.account_balance_outlined, color: accentColor, size: 28),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+        leading: SizedBox(
+          width: 60,
+          child: Icon(Icons.account_balance_outlined, color: accentColor, size: 36),
         ),
         title: Text(
           'Add New Bank',
@@ -186,25 +192,32 @@ class PaymentProvidersPage extends StatelessWidget {
             fontWeight: FontWeight.bold,
           ),
         ),
-        subtitle: Text(
-          'Click to add a bank account',
-          style: TextStyle(
-            color: subtleColor,
-            fontSize: 14,
+        subtitle: Padding(
+          padding: const EdgeInsets.only(top: 4.0),
+          child: Text(
+            'Click to add a bank account',
+            style: TextStyle(
+              color: subtleColor.withValues(alpha: 0.7),
+              fontSize: 14,
+            ),
           ),
         ),
-        trailing: Icon(Icons.chevron_right, color: accentColor.withValues(alpha: 0.6)),
+        trailing: Icon(Icons.chevron_right, color: accentColor, size: 22),
       ),
     );
   }
 
   Widget _buildNote(String text, Color subtleColor) {
-    return Text(
-      text,
-      style: TextStyle(
-        color: subtleColor.withValues(alpha: 0.8),
-        fontSize: 13,
-        height: 1.4,
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 4.0),
+      child: Text(
+        text,
+        style: TextStyle(
+          color: subtleColor.withValues(alpha: 0.6),
+          fontSize: 13,
+          height: 1.5,
+          fontWeight: FontWeight.w400,
+        ),
       ),
     );
   }
