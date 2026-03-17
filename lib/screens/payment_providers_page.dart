@@ -134,11 +134,11 @@ class PaymentProvidersPage extends StatelessWidget {
       child: ListTile(
         contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
         leading: SizedBox(
-          width: 90, // Increased from 60 to accommodate larger horizontal logos
+          width: 110, // Increased from 90 for even larger, more prominent logos
           child: Center(
             child: customLogo ?? (logoPath != null ? Image.asset(
               logoPath,
-              height: 54, // Increased from 42 for a more prominent, mockup-matched look
+              height: 64, // Increased from 54 to match the larger mockup scale
               fit: BoxFit.contain,
               errorBuilder: (ctx, err, stack) => Icon(Icons.account_balance_wallet, color: accentColor, size: 32),
             ) : const SizedBox()),
